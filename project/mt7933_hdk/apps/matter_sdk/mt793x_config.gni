@@ -11,8 +11,6 @@ mt793x_sdk_include_dirs = [
   "${mt793x_sdk_build_root}/filogic/driver/board/mt7933_hdk/util/inc",
   "${mt793x_sdk_build_root}/filogic/driver/chip/inc",
   "${mt793x_sdk_build_root}/filogic/driver/chip/mt7933/inc",
-  "${mt793x_sdk_build_root}/filogic/driver/chip/mt7933/src/common/inc",
-  "${mt793x_sdk_build_root}/filogic/driver/chip/mt7933/src/psramc/inc",
   "${mt793x_sdk_build_root}/filogic/driver/CMSIS/Device/MTK/mt7933/Include",
   "${mt793x_sdk_build_root}/filogic/driver/CMSIS/Include",
 
@@ -225,6 +223,7 @@ mt793x_sdk_defines += [
   "HAL_WDT_MODULE_ENABLED",
   "HAL_TOP_THERMAL_MODULE_ENABLED",
   "HAL_AES_MODULE_ENABLED",
+  "HAL_PWM_MODULE_ENABLED",
   # others
   "MTK_NVDM_ENABLE",
 ]

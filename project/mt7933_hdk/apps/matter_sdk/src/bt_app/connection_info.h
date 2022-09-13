@@ -61,7 +61,7 @@ extern app_bt_connection_cb_t connection_cb[BT_LE_CONNECTION_MAX];
 void init_connection_info(void);
 void add_connection_info(void *buff);
 bool delete_connection_info(void *buff);
-app_bt_connection_cb_t *find_conneciton_info_by_handle(bt_handle_t target_handle);
+app_bt_connection_cb_t *find_connection_info_by_handle(bt_handle_t target_handle);
 app_bt_bonded_info_t *get_bonded_info(const bt_addr_t *target_bt, uint8_t create);
 app_bt_bonded_info_t *find_bonded_info_by_index(uint8_t idx);
 app_bt_bonded_info_t *find_bonded_info_by_handle(bt_handle_t target_handle);
