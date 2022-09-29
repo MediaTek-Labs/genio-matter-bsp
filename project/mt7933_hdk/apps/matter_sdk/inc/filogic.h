@@ -167,7 +167,7 @@ void filogic_wifi_scan(void                     *c,
                        uint8_t                  max_ap_num,
                        filogic_scan_async_cbk   callback);
 
-
+void filogic_wifi_mac_addr_get_sync(void *c, filogic_wifi_opmode_t opmode, uint8_t *addr);
 #ifdef __cplusplus
 }
 #endif

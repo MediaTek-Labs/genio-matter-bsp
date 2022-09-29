@@ -60,6 +60,18 @@ void filogic_led_status_dim(uint8_t dim);
 void filogic_led_light_dim(uint8_t dim);
 
 
+uint8_t filogic_led_light_get_cur_dim_level(void);
+
+
+uint8_t filogic_led_get_max_dim_level(void);
+
+
+uint8_t filogic_led_get_min_dim_level(void);
+
+
+uint8_t filogic_led_status_get_cur_dim_level(void);
+
+
 void filogic_led_status_toggle(bool on_off);
 
 
