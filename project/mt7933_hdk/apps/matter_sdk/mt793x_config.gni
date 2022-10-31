@@ -57,6 +57,8 @@ mt793x_sdk_include_dirs += [
     "${mt793x_sdk_build_root}/filogic/middleware/MTK/bt_callback_manager/inc",
     "${mt793x_sdk_build_root}/filogic/middleware/MTK/bt_tools/picus",
     "${mt793x_sdk_build_root}/filogic/project/mt7933_hdk/apps/matter_sdk/src/bt_app",
+    "${mt793x_sdk_build_root}/filogic/middleware/MTK/fota/inc",
+    "${mt793x_sdk_build_root}/filogic/middleware/MTK/fota/src/v3",
 ]
 
 mt793x_sdk_defines = [
@@ -69,6 +71,8 @@ mt793x_sdk_defines = [
   "MBEDTLS_CONFIG_FILE=\"mt793x-mbedtls-config.h\"",
   "MTK_MINICLI_ENABLE",
   "MTK_MDNS_ENABLE",
+  "MTK_FOTA_V3_ENABLE",
+  "MTK_FOTA_V3_FREERTOS_ENABLE",
   #"MTK_HAL_NO_LOG_ENABLE",
   "MTK_DEBUG_LEVEL_ERROR",
   "MTK_DEBUG_LEVEL_WARNING",

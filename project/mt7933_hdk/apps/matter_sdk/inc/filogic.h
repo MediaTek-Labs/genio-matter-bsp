@@ -7,6 +7,11 @@
 
 #include <wifi_api_ex.h>
 
+#include <v3/fota_download.h>
+
+#include "fota_flash_config.h"
+#include "fota_osal.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +46,16 @@ typedef enum
     FILOGIC_WIFI_OPMODE_MAX,
 } filogic_wifi_opmode_t;
 
+typedef enum
+{
+    FILOGIC_OTA_SUCCESS = 0,
+    FILOGIC_OTA_INIT_FAIL,
+    FILOGIC_OTA_WRITE_FAIL,
+    FILOGIC_OTA_DOWNLOAD_FAIL,
+    FILOGIC_OTA_APPLY_FAIL,
+    FILOGIC_OTA_UNKNOWN_FAIL,
+    FILOGIC_OTA_STATUS_MAX,
+} filogic_ota_state_t;
 
 #define WIFI_SSID_MAX_LEN 32
 #define WIFI_PSK_MAX_LEN  64
@@ -167,7 +182,17 @@ void filogic_wifi_scan(void                     *c,
                        uint8_t                  max_ap_num,
                        filogic_scan_async_cbk   callback);
 
+
 void filogic_wifi_mac_addr_get_sync(void *c, filogic_wifi_opmode_t opmode, uint8_t *addr);
+
+
+void filogic_ota_init_sync(void *c, void *ret);
+
+
+void filogic_ota_io_write_sync(void *c, const void *addr, uint32_t len, void *ret);
+
+
+void filogic_ota_apply_sync(void *c, void *ret);
 #ifdef __cplusplus
 }
 #endif

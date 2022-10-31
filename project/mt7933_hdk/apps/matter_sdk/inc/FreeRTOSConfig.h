@@ -29,10 +29,8 @@
 	See http://www.freertos.org/a00110.html for an explanation of the
 	definitions contained in this file.
 ******************************************************************************/
-
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -53,6 +51,10 @@
 #endif
 
 #include "memory_map.h"
+
+// Select the HEAP in PSRAM as default
+#define configUSE_HEAP_REGION_DEFAULT                  eHeapRegion_PLATFORM
+
 
 #ifdef MTK_OS_HEAP_EXTEND
 //#define configTOTAL_HEAP_SIZE                   ((size_t)(389 * 1024))
