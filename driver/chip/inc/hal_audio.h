@@ -383,6 +383,8 @@ struct bt_Lc3Parameters {
     uint8_t blocksPerSdu;
 };
 
+//#define BT_LEAUDIO_BMR_STEREO_SUPPORT
+
 struct bt_LeAudioCodecConfiguration {
     uint32_t codecType;
     /* This is also bitfield, specifying how the channels are ordered in the outgoing media packet.
@@ -393,6 +395,9 @@ struct bt_LeAudioCodecConfiguration {
     uint8_t plc_method; //Packet Loss Concealment Algorithm
     uint8_t le_audio_type; // 0: UMS ,1: CG , 2: BMS
     uint32_t presentation_delay;//us
+#ifdef BT_LEAUDIO_BMR_STEREO_SUPPORT
+    bool is_stereo;
+#endif
     struct bt_Lc3Parameters lc3Config;
 };
 
@@ -538,6 +543,13 @@ void hal_audio_stop_stream_out(void);
  * @return    #HAL_AUDIO_STATUS_OK, if output volume range is valid.
  */
 hal_audio_status_t hal_audio_set_stream_out_volume(uint32_t digital_volume_index, uint32_t analog_volume_index);
+
+/**
+ * @brief     Set le audio output the volume.
+ * @param[in] analog_volume_index is to set digital gain in centi-db in hex (FFFFFE0C equal to -5db). Gain range: depends on the hardware design and gain map.
+ * @return    #HAL_AUDIO_STATUS_OK, if output volume range is valid.
+ */
+hal_audio_status_t hal_audio_set_stream_out_volume_lea(uint32_t analog_volume_index);
 
 /**
  * @brief     Set audio output DL2 the volume.
@@ -873,6 +885,15 @@ hal_audio_status_t hal_audio_stream_out_set_volume(uint16_t volume_level);
 uint16_t hal_audio_stream_out_write(void *buffer, uint32_t data_size);
 
 #ifdef CFG_AUDIO_DSP_LEAUDIO_EN
+/**
+ * @brief     enable / disable DSP.
+ * @return    #HAL_AUDIO_STATUS_OK, if OK.
+ * @par       Example
+ * @code      hal_audio_dsp_on() / hal_audio_dsp_off();
+ * @endcode
+ */
+hal_audio_status_t hal_audio_dsp_on(void);
+hal_audio_status_t hal_audio_dsp_off(void);
 hal_audio_status_t hal_audio_lea_dl_open(struct bt_LeAudioCodecConfiguration *cfg);
 hal_audio_status_t hal_audio_lea_dl_start(void);
 hal_audio_status_t hal_audio_lea_dl_stop(void);

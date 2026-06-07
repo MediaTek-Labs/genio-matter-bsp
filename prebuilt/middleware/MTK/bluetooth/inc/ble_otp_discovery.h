@@ -205,7 +205,7 @@
 /**
  * @brief The OTP set attribute callback.
  */
-typedef void (*ble_otp_set_attribute_callback_t)(uint8_t service_idx);
+typedef void (*ble_otp_set_attribute_callback_t)(bt_handle_t handle,uint8_t service_idx);
 
 /**
  *  @brief This structure defines the attribute handles of OTS.

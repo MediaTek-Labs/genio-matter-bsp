@@ -99,9 +99,13 @@ ip4_napt_icmp_entry_init(ip4_napt_icmp_entry_t **head, u8_t num)
 
   for (i = 0; i < num; i++) {
     ip4_napt_icmp_entry_t *new_node = (ip4_napt_icmp_entry_t *)mem_malloc(sizeof(ip4_napt_icmp_entry_t));
-
-    new_node->next = *head;
-    *head = new_node;
+    if (new_node) {
+      new_node->next = *head;
+      *head = new_node;
+    }
+    else {
+      break;
+    }
   }
 }
 
@@ -111,7 +115,9 @@ ip4_napt_icmp_list_init(u8_t num)
   ip4_napt_icmp_list_t *icmp_list;
 
   icmp_list = (ip4_napt_icmp_list_t *)mem_malloc(sizeof(ip4_napt_icmp_list_t));
-  ip4_napt_icmp_entry_init(&icmp_list->free_list, num);
+  if (icmp_list) {
+    ip4_napt_icmp_entry_init(&icmp_list->free_list, num);
+  }
 
   return icmp_list;
 }
@@ -123,9 +129,14 @@ ip4_napt_tcpudp_entry_init(ip4_napt_tcpudp_entry_t **head, u8_t num)
 
   for (i = 0; i < num; i++) {
     ip4_napt_tcpudp_entry_t *new_node = (ip4_napt_tcpudp_entry_t *)mem_malloc(sizeof(ip4_napt_tcpudp_entry_t));
-    new_node->port.nport = htons((u16_t) (IP4_NAPT_PORT_START + num - i -1));
-    new_node->next = *head;
-    *head = new_node;
+    if (new_node) {
+      new_node->port.nport = htons((u16_t) (IP4_NAPT_PORT_START + num - i -1));
+      new_node->next = *head;
+      *head = new_node;
+    }
+    else {
+      break;
+    }
   }
 }
 
@@ -135,7 +146,9 @@ ip4_napt_tcpudp_list_init(u8_t num)
   ip4_napt_tcpudp_list_t *tcpudp_list;
 
   tcpudp_list = (ip4_napt_tcpudp_list_t *)mem_malloc(sizeof(ip4_napt_tcpudp_list_t));
-  ip4_napt_tcpudp_entry_init(&tcpudp_list->free_list, num);
+  if (tcpudp_list) {
+    ip4_napt_tcpudp_entry_init(&tcpudp_list->free_list, num);
+  }
 
   return tcpudp_list;
 }
@@ -302,6 +315,7 @@ ip4_napt_icmp_list_remove_head(ip4_napt_icmp_entry_t **head)
   if (*head == NULL) {
     ip4_napt_icmp_used_list_reset();
     LWIP_DEBUGF(IP_DEBUG, ("ip4_napt: icmp list is reset.\n"));
+    return NULL;
   }
   ip4_napt_icmp_entry_t *entry = *head;
   *head = (*head)->next;

@@ -54,7 +54,7 @@ enum pmksa_free_reason {
 	PMKSA_EXPIRE,
 };
 
-#if defined(IEEE8021X_EAPOL) && !defined(CONFIG_NO_WPA)
+#if (defined(IEEE8021X_EAPOL) || defined(CONFIG_SAE)) && !defined(CONFIG_NO_WPA)
 
 struct rsn_pmksa_cache *
 pmksa_cache_init(void (*free_cb)(struct rsn_pmksa_cache_entry *entry,

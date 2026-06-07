@@ -323,6 +323,15 @@ nvdm_status_t nvdm_delete_group(const char *group_name);
  */
 nvdm_status_t nvdm_delete_all(void);
 
+#ifdef USER_DEFINED_ENABLE_NVDM_RESET
+/**
+ * @brief     This function is used to enable the function of resetting the whole nvdm.
+ * @note
+ *                It's dangerous to call this API, as this will remove everything in NVDM region.
+ */
+void nvdm_enable_whole_reset(uint8_t enable);
+#endif
+
 /**
  * @brief     This function marks the start of the query.
  *                User should call this API before #nvdm_query_next_group_name() and

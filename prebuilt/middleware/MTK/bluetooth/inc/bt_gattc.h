@@ -333,6 +333,7 @@ typedef struct {
 BT_PACKED(
 typedef struct {
     uint16_t length;                        /**< The length of total response. */
+    uint16_t attribute_handle;              /**< Attribute handle. */   /*Add for __MTK_ATT_HDL_RSP_EN__*/
     bt_handle_t connection_handle;          /**< Connection handle. */
     bt_att_read_by_type_rsp_t *att_rsp;     /**< A pointer to the structure for the read by type response. */
 }) bt_gattc_read_by_type_rsp_t;
@@ -343,6 +344,7 @@ typedef struct {
 BT_PACKED(
 typedef struct {
     uint16_t length;                    /**< The length of total response. */
+    uint16_t attribute_handle;          /**< Attribute handle. */   /*Add for __MTK_ATT_HDL_RSP_EN__*/
     bt_handle_t connection_handle;      /**< Connection handle. */
     bt_att_read_rsp_t *att_rsp;         /**< A pointer to the structure for the read response. */
 }) bt_gattc_read_rsp_t;
@@ -363,6 +365,7 @@ typedef struct {
 BT_PACKED(
 typedef struct {
     uint16_t length;                        /**< The length of total response. */
+    uint16_t attribute_handle;              /**< Attribute handle. */   /*Add for __MTK_ATT_HDL_RSP_EN__*/
     bt_handle_t connection_handle;          /**< Connection handle. */
     bt_att_read_multiple_rsp_t *att_rsp;    /**< A pointer to the structure for the read multiple response. */
 }) bt_gattc_read_multiple_rsp_t;
@@ -392,6 +395,7 @@ typedef struct {
  */
 BT_PACKED(
 typedef struct {
+    uint16_t attribute_handle;                  /**< Attribute handle. */   /*Add for __MTK_ATT_HDL_RSP_EN__*/
     bt_handle_t connection_handle;              /**< Connection handle. */
     bt_att_write_rsp_t *att_rsp;                /**< A pointer to the structure for the write response. */
 }) bt_gattc_write_rsp_t;
@@ -412,6 +416,7 @@ typedef struct {
  */
 BT_PACKED(
 typedef struct {
+    uint16_t attribute_handle;                  /**< Attribute handle. */   /*Add for __MTK_ATT_HDL_RSP_EN__*/
     bt_handle_t connection_handle;              /**< Connection handle. */
     bt_att_execute_write_rsp_t *att_rsp;        /**< A pointer to the structure for the execute write response. */
 }) bt_gattc_execute_write_rsp_t;

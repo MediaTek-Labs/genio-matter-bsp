@@ -265,7 +265,18 @@
         #define portCLEAN_UP_TCB( pxTCB )                           vPortFreeSecureContext( ( uint32_t * ) pxTCB )
     #else
         #define portALLOCATE_SECURE_CONTEXT( ulSecureStackSize )
-        #if ( configUSE_NEWLIB_REENTRANT == 1 )
+        /* Add GNC version check, after GNUC update to 11.2.1, there is no
+         * thread-specific pointers.
+         *
+         * Detailed information please refer to
+         * https://sourceware.org/git/gitweb.cgi?p=newlib-cygwin.git;h=b0cb9f85ca3626e0e68fd451c3090d253ceb4300
+         * In Newlib, the stdio streams are defined to thread-specific pointers
+         * _reent::_stdin, _reent::_stdout and _reent::_stderr.  If the option is disabled
+         * (the default for most systems), then these pointers are initialized to
+         * thread-specific FILE objects which use file descriptors 0, 1, and 2,
+         * respectively.  There are at least three problems with this:
+         * */
+        #if ( configUSE_NEWLIB_REENTRANT == 1 && !(__GNUC__ >= 11) )
             #define portCLEAN_UP_TCB(pxTCB)   vPortCleanUpTcbClib(&((pxTCB)->xNewLib_reent))
             static inline void vPortCleanUpTcbClib(struct _reent *ptr)
             {

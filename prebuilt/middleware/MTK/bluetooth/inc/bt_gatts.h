@@ -225,20 +225,13 @@ extern const bt_uuid_t BT_GATT_UUID_SERVER_CHARC_CONFIG;        /**< UUID for GA
 extern const bt_uuid_t BT_GATT_UUID_CHARC_FORMAT;               /**< UUID for GATT characteristic presentation format. */
 extern const bt_uuid_t BT_GATT_UUID_CHARC_AGGREGATE_FORMAT;     /**< UUID for GATT characteristic aggregate format. */
 
-/* -------- Callback format ------ */
-/**
- * @brief This function is the record's callback called by the GATTS to read or write the record's attribute value.
- *        If GATTS calls with #BT_GATTS_CALLBACK_READ and with the size of 0, it is a request to query the length of the attribute value.
- * @param[in] rw     is #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE, #BT_GATTS_CALLBACK_PREPARE_WRITE, #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL or #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE.
- * @param[in] handle is the ACL connection handle.
- * @param[in] data   is the data buffer.
- * @param[in] size   is the number of bytes in the data buffer.
- * @param[in] offset is the offset of the attribute value. The read or write starts from the start address of attribute value plus the offset.
- * @return
- *      * For #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE and #BT_GATTS_CALLBACK_PREPARE_WRITE operation, the callback returns the length of the data read or written in the operation.
- *      * For #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL and #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE operation, the callback returns the status of the execute write.
- */
-typedef uint32_t (*bt_gatts_rec_callback_t)(const uint8_t rw, uint16_t handle, void *data, uint16_t size, uint16_t offset);
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+typedef enum {
+    BT_GATTS_CB_TYPE_ORI = 0,
+    BT_GATTS_CB_TYPE_EXT,
+} bt_gatts_rec_cb_type;
+/* End: __MTK_ATT_HDL_RSP_EN__ */
+
 /**
  * @addtogroup BluetoothBLE_GATTS_struct Struct
  * @{
@@ -260,6 +253,7 @@ typedef struct {
     const bt_uuid_t *uuid_ptr; /**< A pointer to the UUID of attribute type. */
     bt_atts_rec_perm_t perm;   /**< The read or write permission and security requirement of the attribute, #BT_GATTS_REC_PERM_READABLE, #BT_GATTS_REC_PERM_WRITABLE. */
     uint8_t value_len;         /**< The length of the attribute value. If the value_len is 0, the record has a callback #bt_gatts_rec_callback_t(), followed by this structure. GATTS will call the record's callback to read or write the attribute value.*/
+    bt_gatts_rec_cb_type cb_type; /**< The type of the callback function. */ /* Add for __MTK_ATT_HDL_RSP_EN__ */
 } bt_gatts_service_rec_t;
 
 /* -------- Service ---------------------------- */
@@ -272,6 +266,38 @@ typedef struct {
     uint8_t  required_encryption_key_size;   /**< The required encryption key size. */
     const bt_gatts_service_rec_t **records;  /**< A pointer to the records in the service. */
 } bt_gatts_service_t;
+
+/* -------- Callback format ------ */
+/**
+ * @brief This function is the record's callback called by the GATTS to read or write the record's attribute value.
+ *        If GATTS calls with #BT_GATTS_CALLBACK_READ and with the size of 0, it is a request to query the length of the attribute value.
+ * @param[in] rw     is #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE, #BT_GATTS_CALLBACK_PREPARE_WRITE, #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL or #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE.
+ * @param[in] handle is the ACL connection handle.
+ * @param[in] data   is the data buffer.
+ * @param[in] size   is the number of bytes in the data buffer.
+ * @param[in] offset is the offset of the attribute value. The read or write starts from the start address of attribute value plus the offset.
+ * @return
+ *      * For #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE and #BT_GATTS_CALLBACK_PREPARE_WRITE operation, the callback returns the length of the data read or written in the operation.
+ *      * For #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL and #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE operation, the callback returns the status of the execute write.
+ */
+typedef uint32_t (*bt_gatts_rec_callback_t)(const uint8_t rw, uint16_t handle, void *data, uint16_t size, uint16_t offset);
+
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+/**
+ * @brief This function is the record's callback called by the GATTS to read or write the record's attribute value.
+ *        If GATTS calls with #BT_GATTS_CALLBACK_READ and with the size of 0, it is a request to query the length of the attribute value.
+ * @param[in] rw     is #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE, #BT_GATTS_CALLBACK_PREPARE_WRITE, #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL or #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE.
+ * @param[in] handle is the ACL connection handle.
+ * @param[in] data   is the data buffer.
+ * @param[in] size   is the number of bytes in the data buffer.
+ * @param[in] offset is the offset of the attribute value. The read or write starts from the start address of attribute value plus the offset.
+ * @param[in] rec    is the pointer to the service record structure.
+ * @return
+ *      * For #BT_GATTS_CALLBACK_READ, #BT_GATTS_CALLBACK_WRITE and #BT_GATTS_CALLBACK_PREPARE_WRITE operation, the callback returns the length of the data read or written in the operation.
+ *      * For #BT_GATTS_CALLBACK_EXECUTE_WRITE_CANCEL and #BT_GATTS_CALLBACK_EXECUTE_WRITE_WRITE operation, the callback returns the status of the execute write.
+ */
+typedef uint32_t (*bt_gatts_rec_callback_ext_t)(const uint8_t rw, uint16_t handle, void *data, uint16_t size, uint16_t offset, const bt_gatts_service_rec_t *rec);
+/* End: __MTK_ATT_HDL_RSP_EN__ */
 
 /**
  *  @brief Request the GATTS to do the execute write.
@@ -336,6 +362,7 @@ typedef struct {
         int16_t value_int_16;               /**< The int16 value of the characteristic.*/
         int32_t value_int_32;               /**< The int32 value of the characteristic.*/
         bt_gatts_rec_callback_t callback;   /**< If the length rec_hdr.value_len is 0, the callback should handle the read and write requests. */
+        bt_gatts_rec_callback_ext_t cb_ext; /**< Same with bt_gatts_rec_callback_t callback, have one more parameter as input */ /* Add for __MTK_ATT_HDL_RSP_EN__ */
     });
 }) bt_gatts_characteristic_value_t;
 
@@ -448,7 +475,10 @@ typedef struct {
 typedef struct {
     // Permission: Application define
     bt_gatts_service_rec_t rec_hdr;     /**< The record, which is the basic element of a service or characteristic. */
-    bt_gatts_rec_callback_t callback;   /**< When the rec_hdr.value_len is 0, the callback should handle the read and write request. */
+    union {
+        bt_gatts_rec_callback_t     cb;     /**< When the rec_hdr.value_len is 0, the callback should handle the read and write request. */
+        bt_gatts_rec_callback_ext_t cb_ext; /**< Same with bt_gatts_rec_callback_t callback, have one more parameter as input */
+    } callback; /* Change to union for __MTK_ATT_HDL_RSP_EN__ */
 } bt_gatts_characteristic_user_description_t;
 
 /**
@@ -462,7 +492,10 @@ typedef bt_gatts_characteristic_str16_t bt_gatts_characteristic_user_description
 typedef struct {
     // Permission: #BT_GATTS_REC_PERM_READABLE | Application define write.
     bt_gatts_service_rec_t rec_hdr;     /**< The record, which is the basic element of a service or characteristic. */
-    bt_gatts_rec_callback_t callback;   /**< If the rec_hdr.value_len is 0, the callback should handle the read and write request. */
+    union {
+        bt_gatts_rec_callback_t     cb;     /**< When the rec_hdr.value_len is 0, the callback should handle the read and write request. */
+        bt_gatts_rec_callback_ext_t cb_ext; /**< Same with bt_gatts_rec_callback_t callback, have one more parameter as input */
+    } callback; /* Change to union for __MTK_ATT_HDL_RSP_EN__ */
 } bt_gatts_client_characteristic_config_t;
 
 /**
@@ -806,8 +839,27 @@ typedef struct {
     .rec_hdr.uuid_ptr = &uuid,                                      \
     .rec_hdr.perm = _perm,                                           \
     .rec_hdr.value_len = 0,                                         \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_ORI, /* Add for __MTK_ATT_HDL_RSP_EN__ */ \
     .value.callback = call                                          \
     }
+
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+/**
+* @brief This macro creates a characteristic value with callback.
+* @param[in] name              is the name of the record.
+* @param[in] uuid              is the UUID of the characteristic value.
+* @param[in] _perm             is the permission of the characteristic value.
+* @param[in] call              is the callback to handle the characteristic value read and write request.
+*/
+#define BT_GATTS_NEW_CHARC_VALUE_CALLBACK_EXT(name, uuid, _perm, call)   \
+    static const bt_gatts_characteristic_t name = {                 \
+    .rec_hdr.uuid_ptr = &uuid,                                      \
+    .rec_hdr.perm = _perm,                                           \
+    .rec_hdr.value_len = 0,                                         \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_EXT,                        \
+    .value.cb_ext = call                                            \
+    }
+/* End: __MTK_ATT_HDL_RSP_EN__ */
 
 /**
 * @brief This macro creates a characteristic value with callback.
@@ -821,8 +873,27 @@ typedef struct {
     .rec_hdr.uuid_ptr = &uuid,                                      \
     .rec_hdr.perm = _perm,                                           \
     .rec_hdr.value_len = 0,                                         \
-    .value.callback = call                                          \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_ORI, /* Add for __MTK_ATT_HDL_RSP_EN__ */ \
+    .value.callback = call       /* Change to union for __MTK_ATT_HDL_RSP_EN__ */ \
     }
+
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+/**
+* @brief This macro creates a characteristic value with callback.
+* @param[in] name              is the name of the record.
+* @param[in] uuid              is the UUID of the characteristic value.
+* @param[in] _perm             is the permission of the characteristic value.
+* @param[in] call              is the callback to handle the characteristic value read and write request.
+*/
+#define BT_GATTS_NEW_CHARC_VALUE_CALLBACK_WRITABLE_EXT(name, uuid, _perm, call)   \
+    static bt_gatts_characteristic_t name = {                 \
+    .rec_hdr.uuid_ptr = &uuid,                                      \
+    .rec_hdr.perm = _perm,                                           \
+    .rec_hdr.value_len = 0,                                         \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_EXT,                        \
+    .value.cb_ext = call                                            \
+    }
+/* End: __MTK_ATT_HDL_RSP_EN__ */
 
 /**
 * @brief This macro creates a str16 characteristic value.
@@ -896,8 +967,26 @@ typedef struct {
     .rec_hdr.uuid_ptr = &BT_GATT_UUID_CHARC_USER_DESCRIPTION,     \
     .rec_hdr.perm = _perm,                                               \
     .rec_hdr.value_len = 0,                                             \
-    .callback = _callback                                                \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_ORI, /* Add for __MTK_ATT_HDL_RSP_EN__ */ \
+    .callback.cb = _callback     /* Change to union for __MTK_ATT_HDL_RSP_EN__ */ \
     }
+
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+/**
+* @brief This macro creates a characteristic user description descriptor.
+* @param[in] name              is the name of the record.
+* @param[in] _perm             is the permission of the record.
+* @param[in] _callback         is the callback to handle the record read and write request.
+*/
+#define BT_GATTS_NEW_CHARC_USER_DESCRIPTION_EXT(name, _perm, _callback)          \
+    static const bt_gatts_characteristic_user_description_t name = {       \
+    .rec_hdr.uuid_ptr = &BT_GATT_UUID_CHARC_USER_DESCRIPTION,     \
+    .rec_hdr.perm = _perm,                                               \
+    .rec_hdr.value_len = 0,                                             \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_EXT,                            \
+    .callback.cb_ext = _callback                                        \
+    }
+/* End: __MTK_ATT_HDL_RSP_EN__ */
 
 /**
 * @brief This macro creates a client characteristic configuration descriptor.
@@ -910,8 +999,26 @@ typedef struct {
     .rec_hdr.uuid_ptr = &BT_GATT_UUID_CLIENT_CHARC_CONFIG,     \
     .rec_hdr.perm = _perm,                                               \
     .rec_hdr.value_len = 0,                                             \
-    .callback = _callback                                                \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_ORI, /* Add for __MTK_ATT_HDL_RSP_EN__ */ \
+    .callback.cb = _callback     /* Change to union for __MTK_ATT_HDL_RSP_EN__ */ \
     }
+
+/* Add for __MTK_ATT_HDL_RSP_EN__ */
+/**
+* @brief This macro creates a client characteristic configuration descriptor.
+* @param[in] name              is the name of the record.
+* @param[in] _perm             is the permission of the record.
+* @param[in] _callback         is the callback to handle the record read and write request.
+*/
+#define BT_GATTS_NEW_CLIENT_CHARC_CONFIG_EXT(name, _perm, _callback)          \
+    static const bt_gatts_client_characteristic_config_t name = {       \
+    .rec_hdr.uuid_ptr = &BT_GATT_UUID_CLIENT_CHARC_CONFIG,     \
+    .rec_hdr.perm = _perm,                                               \
+    .rec_hdr.value_len = 0,                                             \
+    .rec_hdr.cb_type = BT_GATTS_CB_TYPE_EXT,                            \
+    .callback.cb_ext = _callback                                        \
+    }
+/* End: __MTK_ATT_HDL_RSP_EN__ */
 
 /**
 * @brief This macro creates a server characteristic configuration descriptor.

@@ -102,6 +102,13 @@
 #define NOR_OP_EX4B 0xe9    /* Exit 4-byte mode */
 #define NOR_OP_RDP  0xab    /* Release from deep power-down */
 #define NOR_OP_ENTER_DP 0xB9
+
+#define NOR_OP_SUSPEND_MXIC 0xb0    /* MXIC flash suspend */
+#define NOR_OP_RESUME_MXIC  0x30    /* MXIC flash resume */
+#define NOR_OP_RDSCUR_MXIC  0x2b    /* Read security register */
+#define NOR_OP_WRSCUR_MXIC  0x2f    /* Write security registr */
+#define NOR_OP_SUSPEND_WINBOND  0x75    /* Winbond flash suspend */
+#define NOR_OP_RESUME_WINBOND   0x7A    /* Winbond flash resume */
 #define NOR_OP_AAI_WP   0xad
 #define NOR_OP_RDCR_MXIC    0x15
 
@@ -115,6 +122,10 @@
 
 #define SR_QUAD_EN_MX       BIT(6)  /* Macronix Quad I/O */
 #define CR_QUAD_EN_SPAN     BIT(1)  /* Spansion Quad I/O */
+
+#define CR_PROGRAM_SUSPEND  BIT(2)  /* MXIC Program suspend status */
+#define CR_ERASE_SUSPEND    BIT(3)  /* MXIC Erase suspend status */
+#define CR_SUSPEND_STATUS   BIT(7)  /* Winbond Suspend status bit, RO */
 
 #define SPANSION_OP_WRAR    0x71
 #define SPANSION_CR2V_ADDR  0x800003

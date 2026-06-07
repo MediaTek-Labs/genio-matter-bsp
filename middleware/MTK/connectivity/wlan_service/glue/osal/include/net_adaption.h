@@ -41,6 +41,8 @@
 #define SET_TEST_DBDC(_test_winfo, _boolean)	\
 	(_test_winfo->dbdc_mode = _boolean)
 
+#define SEGPARANUM_MAX      50
+
 /* Packet */
 #define SERV_LENGTH_802_11		24
 
@@ -1229,6 +1231,58 @@ struct test_log_dump_cb {
 	struct test_log_dump_entry *entry;
 };
 
+struct list_mode_tx_seg_header {
+	u_int32	u4ExtId;
+	u_int32	u4FC;
+	u_int32	u4Dur;
+	u_int32	u4SeqID;
+	u_int32	u4TxLen;
+	u_int8	aucSourceAddr[SERV_MAC_ADDR_LEN];
+	u_int8	aucDestAddr[SERV_MAC_ADDR_LEN];
+	u_int8	aucBSSID[SERV_MAC_ADDR_LEN];
+	u_int32	u4STBC;
+	u_int32	u4SegNum;
+	u_int32	u4SegParaNum;
+
+	u_int32	au4Buffer[];
+};
+
+struct list_mode_rx_seg_header {
+	u_int32	u4ExtId;
+	u_int8	aucOwnMac[SERV_MAC_ADDR_LEN];
+	u_int32	u4SegNum;
+	u_int32	u4SegParaNum;
+
+	u_int32	au4Buffer[];
+};
+
+struct list_mode_rx_get_status {
+	u_int32	u4ExtId;
+	u_int32	u4SegNumStart;
+};
+
+struct list_mode_rx_status {
+	u_int32	u4RXOK;
+	u_int32	u4FCSErr;
+	u_int32	u4RSSI0;
+	u_int32	u4RSSI1;
+};
+
+#define	LIST_SEG_MAX 100
+#define LIST_MODE_FW_SEG_NUM_MAX	6
+#define LIST_MODE_FW_SEG_PARA_NUM_MAX 30
+
+struct list_mode_event {
+	u_int16	u2Status;
+	u_int32	u4ExtId;
+	u_int32	u4SegNumTotal;
+	u_int32	u4SegNumRead;
+	union {
+		u_int32 u4TxStatus[LIST_SEG_MAX];
+		struct list_mode_rx_status tRxStatus[LIST_SEG_MAX];
+	};
+};
+
 /* Test operation hook handlers for service */
 struct test_operation {
 	s_int32 (*op_set_tr_mac)(
@@ -1610,6 +1664,12 @@ struct test_operation {
 		struct test_wlan_info *winfos,
 		struct test_configuration *configs,
 		u_char band_idx);
+	s_int32 (*op_listmode_cmd)(
+		struct test_wlan_info *winfos,
+		u_int8 *para,
+		u_int16 para_len,
+		u_int32 *rsp_len,
+		void *rsp_data);
 	s_int32 (*op_set_test_mode_dnlk_clean)(
 		struct test_wlan_info *winfos);
 	s_int32 (*op_set_test_mode_dnlk_2g)(

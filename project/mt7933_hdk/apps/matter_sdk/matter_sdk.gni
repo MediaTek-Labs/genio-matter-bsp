@@ -73,6 +73,17 @@ template("matter_sdk") {
       "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/libhal_core_CM33_GCC.a",
     ]
 
+    if ((MTK_PACKAGE_TYPE == "QFN") && (HAL_Lib)) {
+      libs += [
+        "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/libhal_CM33_QFN_GCC.a",
+      ]
+    }
+    else if ((MTK_PACKAGE_TYPE == "BGA") && (HAL_Lib)) {
+      libs += [
+        "${mt793x_sdk_root}/prebuilt/driver/chip/mt7933/lib/libhal_CM33_BGA_GCC.a",
+      ]
+    }
+
     # Wi-Fi
     libs += [
       "${mt793x_sdk_root}/prebuilt/middleware/MTK/connectivity/wlan/lib/libwifi.a",

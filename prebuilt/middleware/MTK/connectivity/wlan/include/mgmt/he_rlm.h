@@ -157,6 +157,10 @@ void heRlmRecHeOperation(
 	struct ADAPTER *prAdapter,
 	struct BSS_INFO *prBssInfo,
 	u_int8_t *pucIE);
+void heRlmRecBssColorChangeAnnouncement(
+	struct ADAPTER *prAdapter,
+	struct BSS_INFO *prBssInfo,
+	uint8_t *pucIE);
 u_int8_t heRlmRecHeSRParams(
 	struct ADAPTER *prAdapter,
 	struct BSS_INFO *prBssInfo,

@@ -77,10 +77,12 @@ enum {RX, TX, NONE_TRX};
 typedef unsigned char  BOOL;
 #endif /* #ifndef BOOL */
 
+#ifdef __cplusplus
+#else
 #ifndef bool
 typedef unsigned char  bool;
 #endif /* #ifndef bool */
-
+#endif
 /*==== TYPES ======================================================*/
 
 typedef unsigned char   kal_uint8;

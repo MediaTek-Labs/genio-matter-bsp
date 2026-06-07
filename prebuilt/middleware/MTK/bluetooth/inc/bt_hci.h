@@ -105,6 +105,9 @@
  */
 
 #include "bt_type.h"
+#ifdef __MTK_APCF_ENABLE__
+#include "bt_uuid.h"
+#endif
 
 /**
  * @defgroup Bluetoothhbif_hci_le_define Define
@@ -183,6 +186,9 @@
 #define BT_HCI_STATUS_OPERATION_CANCELLED_BY_HOST            0x44   /**< Operation cancelled by host. */
 
 #define BT_HCI_STATUS_VENDOR_REMOTE_CONNECTION_EXIST         0xB0   /**< Vendor status: connection exist in smart phone. */
+
+#define BT_HCI_STATUS_ROLE_SWITCHNG                          0x82   /**< Vendor status:agent receive 41 by sending D1. */
+
 
 #define BT_HCI_LE_ADVERTISING_DATA_LENGTH_MAXIMUM            31      /**< Define the maximum advertising data length. */
 
@@ -282,6 +288,29 @@ typedef uint8_t bt_hci_le_periodic_sync_filter_t;   /**< The periodic sync filte
 #define BT_HCI_IAC_LAP_TYPE_LIAC    0x9E8B00    /**< The iac lap value of LIAC. */
 #define BT_HCI_IAC_LAP_TYPE_GIAC    0x9E8B33    /**< The iac lap value of GIAC. */
 typedef uint32_t bt_hci_iac_lap_t; /**< The iac lap value, the range is from 0x0x9E8B00 to 0x9E8B3F, Please refer to <a href="https://www.bluetooth.com/specifications/assigned-numbers/baseband">The DIACs field</a>. */
+
+#ifdef __MTK_APCF_ENABLE__
+#define APCF_ACTION_ADD                                     0x00    /**< APCF action: add */
+#define APCF_ACTION_DEL                                     0x01    /**< APCF action: delete */
+#define APCF_ACTION_CLR                                     0x02    /**< APCF action: clear */
+typedef uint8_t apcf_action_t;
+
+#define APCF_COND_ADDR_FILTER                               0x00    /**< APCF filter condition type: broadcaster address */
+#define APCF_COND_SRVC_UUID                                 0x01    /**< APCF filter condition type: service uuid */
+#define APCF_COND_SRVC_SOL_UUID                             0x02    /**< APCF filter condition type: solicitation uuid */
+#define APCF_COND_LOCAL_NAME                                0x03    /**< APCF filter condition type: local name */
+#define APCF_COND_MANU_DATA                                 0x04    /**< APCF filter condition type: manufacturer data */
+#define APCF_COND_SRVC_DATA_PATTERN                         0x05    /**< APCF filter condition type: service data pattern */
+#define APCF_COND_ALL                                       0x06    /**< APCF filter condition type: all */
+#define APCF_COND_MAX                                       0x07    /**< APCF filter condition type: maximum */
+typedef uint8_t apcf_condition_t;
+
+#define APCF_LOGIC_OR                                       0x00    /**< APCF logic type: OR */
+#define APCF_LOGIC_AND                                      0x01    /**< APCF logic type: AND */
+typedef uint8_t apcf_logic_type_t;
+
+#define APCF_MAX_DATA_LEN                                   29      /**< APCF Maximum Pattern/Data Length */
+#endif // __MTK_APCF_ENABLE__
 
 /**
  * @}
@@ -547,6 +576,16 @@ typedef struct {
     uint16_t                            sync_timeout;                /**< Synchronization timeout for the periodic advertising. The range is from 0x000A to 0x4000. */
     uint8_t                             unused;                      /**< 0x00. Other is reserved for future use. */
 }) bt_hci_cmd_le_periodic_advertising_create_sync_t;
+
+/**
+ *  @brief      Set LE ADV public address Command.
+ */
+BT_PACKED(
+typedef struct {
+    uint8_t           enable;                   /**< LE puclic address enable. */
+    uint8_t           advertising_handle;       /**< Advertsing handle. */
+    bt_bd_addr_t      public_address;           /**< Public address */
+}) bt_hci_cmd_vendor_le_set_adv_public_addr_t;
 
 /**
  *  @brief      Read the RSSI command complete event.
@@ -836,6 +875,113 @@ typedef struct {
     bt_hci_status_t status;                     /**< Status. */
     uint8_t         cig_id;                     /**< CIG id. */
 }) bt_hci_le_remove_cig_t;
+
+#ifdef __MTK_APCF_ENABLE__
+/**
+ *  @brief      LE APCF: broadcast address
+ */
+BT_PACKED (
+typedef struct {
+    bt_addr_t addr;
+    uint8_t client_if;              /**< internal use, must be at the end */
+}) apcf_addr_cond_t;
+
+/**
+ *  @brief      LE APCF: (solicitated) service uuid filtering
+ */
+BT_PACKED (
+typedef struct {
+    bt_uuid_t uuid;
+    bt_uuid_t uuid_mask;
+    uint8_t client_if;              /**< internal use, must be at the end */
+}) apcf_uuid_cond_t;
+
+/**
+ *  @brief      LE APCF: local name filtering
+ */
+BT_PACKED (
+typedef struct {
+    uint8_t data_len;                         /* <= APCF_MAX_DATA_LEN */
+    uint8_t data[APCF_MAX_DATA_LEN];
+    uint8_t client_if;                        /**< internal use, must be at the end */
+}) apcf_local_name_cond_t;
+
+/**
+ *  @brief      LE APCF: manufacturer data filtering
+ */
+BT_PACKED (
+typedef struct {
+    uint16_t company_id;
+    uint8_t  data_len;                        /* <= APCF_MAX_DATA_LEN */
+    uint8_t  pattern[APCF_MAX_DATA_LEN];
+    uint16_t company_id_mask;
+    uint8_t  pattern_mask[APCF_MAX_DATA_LEN];
+    uint8_t  client_if;                       /**< internal use, must be at the end */
+}) apcf_manu_cond_t;
+
+/**
+ *  @brief      LE APCF: service data pattern
+ */
+BT_PACKED (
+typedef struct {
+    uint16_t uuid;
+    uint8_t  data_len;                        /* <= APCF_MAX_DATA_LEN */
+    uint8_t  pattern[APCF_MAX_DATA_LEN];
+    uint8_t  pattern_mask[APCF_MAX_DATA_LEN];
+    uint8_t  client_if;                       /**< internal use, must be at the end */
+}) apcf_srvc_pattern_cond_t;
+
+/**
+ *  @brief      LE APCF: filter condition parameter
+ */
+BT_PACKED (
+typedef union {
+    apcf_addr_cond_t         broadcast_addr;
+    apcf_local_name_cond_t   local_name;
+    apcf_manu_cond_t         manu_data;
+    apcf_uuid_cond_t         srvc_uuid;
+    apcf_uuid_cond_t         solicitate_uuid;
+    apcf_srvc_pattern_cond_t srvc_data;
+}) apcf_condition_param_t;
+
+/**
+ *  @brief      LE set APCF filter parameter command
+ */
+BT_PACKED (
+typedef struct {
+    apcf_action_t   action;
+    uint8_t         filter_index;
+    uint16_t        feature_sel;
+    uint16_t        list_logic_type;
+    uint8_t         filter_logic_type;
+    uint8_t         rssi_high_thresh;
+    uint8_t         delivery_mode;
+    uint16_t        onfound_timeout;
+    uint8_t         onfound_timeout_cnt;
+    uint8_t         rssi_low_thresh;
+    uint16_t        onlost_timeout;
+    uint16_t        num_of_tracking_entries;
+    uint8_t         client_if;     /**< internal use, must be at the end */
+}) bt_hci_cmd_le_set_filtering_parameters_t;
+
+/**
+ *  @brief      LE set APCF enable command
+ */
+BT_PACKED (
+typedef struct {
+    uint8_t         enable;
+    uint8_t         client_if;     /**< internal use, must be at the end */
+}) bt_hci_cmd_le_set_filtering_enable_t;
+
+/**
+ *  @brief      LE APCF: clear some filter rule
+ */
+BT_PACKED (
+typedef struct {
+    uint8_t         action;
+    uint8_t         filter_index;
+}) bt_hci_cmd_le_set_filtering_clear_t;
+#endif // __MTK_APCF_ENABLE__
 
 /**
  * @}

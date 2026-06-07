@@ -154,11 +154,12 @@ void twtPlannerRxNegoResult(
 	struct ADAPTER *prAdapter,
 	struct MSG_HDR *prMsgHdr);
 
-void twtPlannerSuspendDone(
+void twtPlannerTeardownDone(
 	struct ADAPTER *prAdapter,
 	struct MSG_HDR *prMsgHdr);
 
-void twtPlannerTeardownDone(
+#if (CFG_SUPPORT_TWT_SUSPEND_RESUME == 1)
+void twtPlannerSuspendDone(
 	struct ADAPTER *prAdapter,
 	struct MSG_HDR *prMsgHdr);
 
@@ -166,9 +167,29 @@ void twtPlannerResumeDone(
 	struct ADAPTER *prAdapter,
 	struct MSG_HDR *prMsgHdr);
 
+void twtPlannerFillResumeData(
+	struct ADAPTER *prAdapter,
+	struct STA_RECORD *prStaRec,
+	uint8_t ucFlowId,
+	uint64_t u8NextTWT);
+#endif
+
 void twtPlannerRxInfoFrm(
 	struct ADAPTER *prAdapter,
 	struct MSG_HDR *prMsgHdr);
+
+uint32_t
+twtPlannerDrvAgrtGet(struct ADAPTER *prAdapter,
+	uint8_t ucBssIdx, uint8_t ucFlowId,
+	uint8_t *pucIdx, struct _TWT_PARAMS_T *prTWTParams);
+
+
+#if (CFG_TWT_STA_DIRECT_TEARDOWN == 1)
+void twtPlannerTearingdown(
+	struct ADAPTER *prAdapter,
+	struct STA_RECORD *prStaRec,
+	uint8_t ucFlowId);
+#endif
 
 /*******************************************************************************
 *                              F U N C T I O N S

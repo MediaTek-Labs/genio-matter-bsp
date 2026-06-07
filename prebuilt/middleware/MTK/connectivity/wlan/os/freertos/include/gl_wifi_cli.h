@@ -124,6 +124,9 @@ extern char *RATE_V2_HW_TX_MODE_STR[];
 #define CMD_ROAM_STABLE_TIME        "RoamingStableTimeSec"
 
 #define CMD_ROAM_SPLIT_SCAN         "scan set SplitScan"
+#define CMD_SCAN_DFS_TIME           "ScnChannelDFSTime"
+#define CMD_SCAN_DFS_IN_ACTIVE      "scan set DfsDwellInActive"
+
 
 #define ROAM_TYPE_BY_RSSI (0)
 #define ROAM_TYPE_BY_BCNMISS (1)
@@ -373,6 +376,7 @@ struct wifi_cfg {
 	uint8_t ap_default_key_id;
 	uint8_t ap_wireless_mode;
 	uint8_t ap_dtim_interval;
+	uint8_t coex_submode;
 };
 
 /*******************************************************************************
@@ -1113,6 +1117,17 @@ uint8_t wifi_config_set_country_code_ex(uint8_t len, char *param[]);
 */
 uint8_t wifi_config_get_country_code_ex(uint8_t len, char *param[]);
 
+#if CFG_SUPPORT_REG_RULES
+/**
+* @brief Check the reg rules.
+* @param [IN]channel and country_code
+* wifi config get reg_rules
+*
+* @return =0 means success, >0 means fail
+*/
+uint8_t wifi_config_reg_rules_allow_channel_ex(uint8_t len, char *param[]);
+#endif
+
 /**
 * @brief Example of Get WiFi DTIM Interval
 * @param  [OUT]interval: 1~255
@@ -1301,6 +1316,26 @@ uint8_t wifi_config_set_ps_mode_ex(uint8_t len, char *param[]);
 
 uint8_t wifi_config_get_ps_mode_ex(uint8_t len, char *param[]);
 
+#ifdef MTK_IEEE8021X_ENABLE
+uint8_t wifi_config_set_eap_user_id_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_get_eap_user_id_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_set_eap_user_pwd_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_get_eap_user_pwd_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_set_eap_type_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_get_eap_type_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_set_load_cert_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_set_eap_key_pwd_ex(uint8_t len, char *param[]);
+
+uint8_t wifi_config_get_eap_key_pwd_ex(uint8_t len, char *param[]);
+#endif
+
 int32_t wifi_config_init(struct wifi_cfg *wifi_config);
 
 uint8_t wifi_init_ex(uint8_t len, char *param[]);
@@ -1430,6 +1465,7 @@ uint8_t wifi_config_get_wow_udp_ex(uint8_t len, char *param[]);
 uint8_t wifi_config_set_wow_tcp_ex(uint8_t len, char *param[]);
 uint8_t wifi_config_set_wow_tcp_del_ex(uint8_t len, char *param[]);
 uint8_t wifi_config_get_wow_tcp_ex(uint8_t len, char *param[]);
+uint8_t wifi_config_set_wow_handler_ex(uint8_t len, char *param[]);
 
 #if CFG_SUPPORT_ROAMING_CUSTOMIZED
 uint8_t wifi_config_set_roam_delta_ex(uint8_t len, char *param[]);
@@ -1566,6 +1602,18 @@ uint8_t wifi_config_set_antdiv_mode_ex(uint8_t len, char *param[]);
 uint8_t wifi_config_get_antdiv_mode_ex(uint8_t len, char *param[]);
 
 uint8_t wifi_config_get_antdiv_cur_idx_ex(uint8_t len, char *param[]);
+#endif
+
+uint8_t wifi_config_get_twt_param_ex(uint8_t len, char *param[]);
+
+#if CFG_SUPPORT_SCAN_CH_TIME
+uint8_t wifi_config_set_dwll_time_ex(uint8_t len, char *param[]);
+uint8_t wifi_config_set_DFS_dwll_time_ex(uint8_t len, char *param[]);
+#endif
+
+#if CFG_SUPPORT_EDCCA_TH_CUSTOMIZED
+uint8_t wifi_config_set_EDCCA_threshold_ex(uint8_t len, char *param[]);
+uint8_t wifi_config_get_EDCCA_threshold_ex(uint8_t len, char *param[]);
 #endif
 
 #if 0

@@ -25,10 +25,8 @@
 #include "syslog.h"
 
 #ifdef MTK_HTTPCLIENT_SSL_ENABLE
-//#include "mbedtls/compat-1.3.h"
 #include "mbedtls/net.h"
 #include "mbedtls/ssl.h"
-#include "mbedtls/certs.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #endif

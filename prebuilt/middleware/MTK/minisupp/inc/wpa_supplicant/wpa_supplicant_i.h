@@ -691,7 +691,7 @@ struct active_scs_elem {
 
 extern struct wpa_config *new_conf_sta;
 extern struct wpa_config *new_conf_ap;
-
+extern struct wpa_config *new_conf_p2p;
 /**
  * struct wpa_supplicant - Internal data for wpa_supplicant interface
  *
@@ -1920,7 +1920,7 @@ void wpa_supplicant_entry_op_mode_get(unsigned char *op_mode);
 int wpa_supplicant_entry_op_mode_set(unsigned char op_mode);
 
 #ifdef CONFIG_AP
-nvdm_status_t hostapd_config_read(const char *data_item_name,
+int hostapd_config_read(const char *data_item_name,
 		char *buf, int *errors, uint32_t size);
 #endif
 #endif /* WPA_SUPPLICANT_I_H */

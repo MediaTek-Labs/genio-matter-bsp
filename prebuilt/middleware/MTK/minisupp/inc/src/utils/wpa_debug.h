@@ -92,8 +92,11 @@ void wpa_debug_print_timestamp(void);
  *
  * Note: New line '\n' is added to the end of the text when printing to stdout.
  */
+#ifdef CONFIG_MTK_DEBUG
+#define CFG_MINISUPP_DBG_ENABLE_CLASS   DBG_MINISUPP_LOG_LEVEL_EXTREME
+#else
 #define CFG_MINISUPP_DBG_ENABLE_CLASS    DBG_MINISUPP_LOG_LEVEL_INFO
-
+#endif
 #define wpa_printf(level, ...) \
 	wpa_printf_##level(level, ##__VA_ARGS__)
 #define wpa_hexdump(level, ...) \
@@ -186,11 +189,17 @@ void wpa_debug_print_timestamp(void);
 		LOG_I(minisupp, ##__VA_ARGS__); \
 	} while (0)
 
+#ifdef CONFIG_MTK_DEBUG
+#define __MINISUPP_DBGLOG_DEBUG__(level, ...) \
+	do { \
+		LOG_I(minisupp, ##__VA_ARGS__); \
+	} while (0)
+#else
 #define __MINISUPP_DBGLOG_DEBUG__(level, ...) \
 	do { \
 		LOG_D(minisupp, ##__VA_ARGS__); \
 	} while (0)
-
+#endif
 /* runtime debug level "wpa_debug_level", "level" */
 #define wpa_printf_wpa_debug_level __MINISUPP_DBGLOG__
 #define wpa_printf_level __MINISUPP_WPA_PRINTF__

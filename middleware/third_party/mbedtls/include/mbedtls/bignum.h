@@ -5,28 +5,13 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 #ifndef MBEDTLS_BIGNUM_H
 #define MBEDTLS_BIGNUM_H
+#include "mbedtls/private_access.h"
 
-#if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
+#include "mbedtls/build_info.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -35,14 +20,22 @@
 #include <stdio.h>
 #endif
 
-#define MBEDTLS_ERR_MPI_FILE_IO_ERROR                     -0x0002  /**< An error occurred while reading from or writing to a file. */
-#define MBEDTLS_ERR_MPI_BAD_INPUT_DATA                    -0x0004  /**< Bad input parameters to function. */
-#define MBEDTLS_ERR_MPI_INVALID_CHARACTER                 -0x0006  /**< There is an invalid character in the digit string. */
-#define MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL                  -0x0008  /**< The buffer is too small to write to. */
-#define MBEDTLS_ERR_MPI_NEGATIVE_VALUE                    -0x000A  /**< The input arguments are negative or result in illegal output. */
-#define MBEDTLS_ERR_MPI_DIVISION_BY_ZERO                  -0x000C  /**< The input argument for division is zero, which is not allowed. */
-#define MBEDTLS_ERR_MPI_NOT_ACCEPTABLE                    -0x000E  /**< The input arguments are not acceptable. */
-#define MBEDTLS_ERR_MPI_ALLOC_FAILED                      -0x0010  /**< Memory allocation failed. */
+/** An error occurred while reading from or writing to a file. */
+#define MBEDTLS_ERR_MPI_FILE_IO_ERROR                     -0x0002
+/** Bad input parameters to function. */
+#define MBEDTLS_ERR_MPI_BAD_INPUT_DATA                    -0x0004
+/** There is an invalid character in the digit string. */
+#define MBEDTLS_ERR_MPI_INVALID_CHARACTER                 -0x0006
+/** The buffer is too small to write to. */
+#define MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL                  -0x0008
+/** The input arguments are negative or result in illegal output. */
+#define MBEDTLS_ERR_MPI_NEGATIVE_VALUE                    -0x000A
+/** The input argument for division is zero, which is not allowed. */
+#define MBEDTLS_ERR_MPI_DIVISION_BY_ZERO                  -0x000C
+/** The input arguments are not acceptable. */
+#define MBEDTLS_ERR_MPI_NOT_ACCEPTABLE                    -0x000E
+/** Memory allocation failed. */
+#define MBEDTLS_ERR_MPI_ALLOC_FAILED                      -0x0010
 
 #define MBEDTLS_MPI_CHK(f)       \
     do                           \
@@ -58,15 +51,15 @@
 
 #if !defined(MBEDTLS_MPI_WINDOW_SIZE)
 /*
- * Maximum window size used for modular exponentiation. Default: 6
+ * Maximum window size used for modular exponentiation. Default: 3
  * Minimum value: 1. Maximum value: 6.
  *
  * Result is an array of ( 2 ** MBEDTLS_MPI_WINDOW_SIZE ) MPIs used
- * for the sliding window calculation. (So 64 by default)
+ * for the sliding window calculation. (So 8 by default)
  *
  * Reduction in size, reduces speed.
  */
-#define MBEDTLS_MPI_WINDOW_SIZE                           6        /**< Maximum window size used. */
+#define MBEDTLS_MPI_WINDOW_SIZE                           3        /**< Maximum window size used. */
 #endif /* !MBEDTLS_MPI_WINDOW_SIZE */
 
 #if !defined(MBEDTLS_MPI_MAX_SIZE)
@@ -102,7 +95,9 @@
  */
 #define MBEDTLS_MPI_MAX_BITS_SCALE100          ( 100 * MBEDTLS_MPI_MAX_BITS )
 #define MBEDTLS_LN_2_DIV_LN_10_SCALE100                 332
-#define MBEDTLS_MPI_RW_BUFFER_SIZE             ( ((MBEDTLS_MPI_MAX_BITS_SCALE100 + MBEDTLS_LN_2_DIV_LN_10_SCALE100 - 1) / MBEDTLS_LN_2_DIV_LN_10_SCALE100) + 10 + 6 )
+#define MBEDTLS_MPI_RW_BUFFER_SIZE             (((MBEDTLS_MPI_MAX_BITS_SCALE100 + \
+                                                  MBEDTLS_LN_2_DIV_LN_10_SCALE100 - 1) / \
+                                                 MBEDTLS_LN_2_DIV_LN_10_SCALE100) + 10 + 6)
 
 /*
  * Define the base integer type, architecture-wise.
@@ -122,6 +117,7 @@
         #endif /* !MBEDTLS_HAVE_INT64 */
         typedef  int64_t mbedtls_mpi_sint;
         typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
     #elif defined(__GNUC__) && (                         \
         defined(__amd64__) || defined(__x86_64__)     || \
         defined(__ppc64__) || defined(__powerpc64__)  || \
@@ -134,6 +130,7 @@
         #endif /* MBEDTLS_HAVE_INT64 */
         typedef  int64_t mbedtls_mpi_sint;
         typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
         #if !defined(MBEDTLS_NO_UDBL_DIVISION)
             /* mbedtls_t_udbl defined as 128-bit unsigned int */
             typedef unsigned int mbedtls_t_udbl __attribute__((mode(TI)));
@@ -149,6 +146,7 @@
         #endif /* !MBEDTLS_HAVE_INT64 */
         typedef  int64_t mbedtls_mpi_sint;
         typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
         #if !defined(MBEDTLS_NO_UDBL_DIVISION)
             /* mbedtls_t_udbl defined as 128-bit unsigned int */
             typedef __uint128_t mbedtls_t_udbl;
@@ -158,6 +156,7 @@
         /* Force 64-bit integers with unknown compiler */
         typedef  int64_t mbedtls_mpi_sint;
         typedef uint64_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT64_MAX
     #endif
 #endif /* !MBEDTLS_HAVE_INT32 */
 
@@ -168,11 +167,35 @@
     #endif /* !MBEDTLS_HAVE_INT32 */
     typedef  int32_t mbedtls_mpi_sint;
     typedef uint32_t mbedtls_mpi_uint;
+#define MBEDTLS_MPI_UINT_MAX                UINT32_MAX
     #if !defined(MBEDTLS_NO_UDBL_DIVISION)
         typedef uint64_t mbedtls_t_udbl;
         #define MBEDTLS_HAVE_UDBL
     #endif /* !MBEDTLS_NO_UDBL_DIVISION */
 #endif /* !MBEDTLS_HAVE_INT64 */
+
+/*
+ * Sanity check that exactly one of MBEDTLS_HAVE_INT32 or MBEDTLS_HAVE_INT64 is defined,
+ * so that code elsewhere doesn't have to check.
+ */
+#if (!(defined(MBEDTLS_HAVE_INT32) || defined(MBEDTLS_HAVE_INT64))) || \
+    (defined(MBEDTLS_HAVE_INT32) && defined(MBEDTLS_HAVE_INT64))
+#error "Only 32-bit or 64-bit limbs are supported in bignum"
+#endif
+
+/** \typedef mbedtls_mpi_uint
+ * \brief The type of machine digits in a bignum, called _limbs_.
+ *
+ * This is always an unsigned integer type with no padding bits. The size
+ * is platform-dependent.
+ */
+
+/** \typedef mbedtls_mpi_sint
+ * \brief The signed type corresponding to #mbedtls_mpi_uint.
+ *
+ * This is always an signed integer type with no padding bits. The size
+ * is platform-dependent.
+ */
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,14 +207,40 @@ extern "C" {
 /**
  * \brief          MPI structure
  */
-typedef struct mbedtls_mpi
-{
-    int s;              /*!<  Sign: -1 if the mpi is negative, 1 otherwise */
-    size_t n;           /*!<  total # of limbs  */
-    mbedtls_mpi_uint *p;          /*!<  pointer to limbs  */
+typedef struct mbedtls_mpi {
+    /** Pointer to limbs.
+     *
+     * This may be \c NULL if \c n is 0.
+     */
+    mbedtls_mpi_uint *MBEDTLS_PRIVATE(p);
+
+    /** Sign: -1 if the mpi is negative, 1 otherwise.
+     *
+     * The number 0 must be represented with `s = +1`. Although many library
+     * functions treat all-limbs-zero as equivalent to a valid representation
+     * of 0 regardless of the sign bit, there are exceptions, so bignum
+     * functions and external callers must always set \c s to +1 for the
+     * number zero.
+     *
+     * Note that this implies that calloc() or `... = {0}` does not create
+     * a valid MPI representation. You must call mbedtls_mpi_init().
+     */
+    signed short MBEDTLS_PRIVATE(s);
+
+    /** Total number of limbs in \c p.  */
+    unsigned short MBEDTLS_PRIVATE(n);
 #ifdef MBEDTLS_MTK
     mbedtls_mpi_uint limbs[MBEDTLS_MPI_MAX_STACK_LIMBS];
 #endif /* MBEDTLS_MTK */
+/* Make sure that MBEDTLS_MPI_MAX_LIMBS fits in n.
+     * Use the same limit value on all platforms so that we don't have to
+     * think about different behavior on the rare platforms where
+     * unsigned short can store values larger than the minimum required by
+     * the C language, which is 65535.
+     */
+#if MBEDTLS_MPI_MAX_LIMBS > 65535
+#error "MBEDTLS_MPI_MAX_LIMBS > 65535 is not supported"
+#endif
 }
 mbedtls_mpi;
 
@@ -278,7 +327,7 @@ void mbedtls_mpi_swap( mbedtls_mpi *X, mbedtls_mpi *Y );
  * \param Y        The MPI to be assigned from. This must point to an
  *                 initialized MPI.
  * \param assign   The condition deciding whether to perform the
- *                 assignment or not. Possible values:
+ *                 assignment or not. Must be either 0 or 1:
  *                 * \c 1: Perform the assignment `X = Y`.
  *                 * \c 0: Keep the original value of \p X.
  *
@@ -288,6 +337,10 @@ void mbedtls_mpi_swap( mbedtls_mpi *X, mbedtls_mpi *Y );
  *                 the assignment was done or not (the above code may leak
  *                 information through branch prediction and/or memory access
  *                 patterns analysis).
+ *
+ * \warning        If \p assign is neither 0 nor 1, the result of this function
+ *                 is indeterminate, and the resulting value in \p X might be
+ *                 neither its original value nor the value in \p Y.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
@@ -301,24 +354,28 @@ int mbedtls_mpi_safe_cond_assign( mbedtls_mpi *X, const mbedtls_mpi *Y, unsigned
  *
  * \param X        The first MPI. This must be initialized.
  * \param Y        The second MPI. This must be initialized.
- * \param assign   The condition deciding whether to perform
- *                 the swap or not. Possible values:
+ * \param swap     The condition deciding whether to perform
+ *                 the swap or not. Must be either 0 or 1:
  *                 * \c 1: Swap the values of \p X and \p Y.
  *                 * \c 0: Keep the original values of \p X and \p Y.
  *
  * \note           This function is equivalent to
- *                      if( assign ) mbedtls_mpi_swap( X, Y );
+ *                      if( swap ) mbedtls_mpi_swap( X, Y );
  *                 except that it avoids leaking any information about whether
- *                 the assignment was done or not (the above code may leak
+ *                 the swap was done or not (the above code may leak
  *                 information through branch prediction and/or memory access
  *                 patterns analysis).
+ *
+ * \warning        If \p swap is neither 0 nor 1, the result of this function
+ *                 is indeterminate, and both \p X and \p Y might end up with
+ *                 values different to either of the original ones.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
  * \return         Another negative error code on other kinds of failure.
  *
  */
-int mbedtls_mpi_safe_cond_swap( mbedtls_mpi *X, mbedtls_mpi *Y, unsigned char assign );
+int mbedtls_mpi_safe_cond_swap(mbedtls_mpi *X, mbedtls_mpi *Y, unsigned char swap);
 
 /**
  * \brief          Store integer value in MPI.
@@ -490,7 +547,7 @@ int mbedtls_mpi_write_file( const char *p, const mbedtls_mpi *X,
  * \param X        The destination MPI. This must point to an initialized MPI.
  * \param buf      The input buffer. This must be a readable buffer of length
  *                 \p buflen Bytes.
- * \param buflen   The length of the input buffer \p p in Bytes.
+ * \param buflen   The length of the input buffer \p buf in Bytes.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
@@ -505,7 +562,7 @@ int mbedtls_mpi_read_binary( mbedtls_mpi *X, const unsigned char *buf,
  * \param X        The destination MPI. This must point to an initialized MPI.
  * \param buf      The input buffer. This must be a readable buffer of length
  *                 \p buflen Bytes.
- * \param buflen   The length of the input buffer \p p in Bytes.
+ * \param buflen   The length of the input buffer \p buf in Bytes.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
@@ -554,6 +611,8 @@ int mbedtls_mpi_write_binary_le( const mbedtls_mpi *X,
  * \brief          Perform a left-shift on an MPI: X <<= count
  *
  * \param X        The MPI to shift. This must point to an initialized MPI.
+ *                 The MPI pointed by \p X may be resized to fit
+ *                 the resulting number.
  * \param count    The number of bits to shift by.
  *
  * \return         \c 0 if successful.
@@ -751,11 +810,11 @@ int mbedtls_mpi_mul_int( mbedtls_mpi *X, const mbedtls_mpi *A,
  *
  * \param Q        The destination MPI for the quotient.
  *                 This may be \c NULL if the value of the
- *                 quotient is not needed.
+ *                 quotient is not needed. This must not alias A or B.
  * \param R        The destination MPI for the remainder value.
  *                 This may be \c NULL if the value of the
- *                 remainder is not needed.
- * \param A        The dividend. This must point to an initialized MPi.
+ *                 remainder is not needed. This must not alias A or B.
+ * \param A        The dividend. This must point to an initialized MPI.
  * \param B        The divisor. This must point to an initialized MPI.
  *
  * \return         \c 0 if successful.
@@ -772,10 +831,10 @@ int mbedtls_mpi_div_mpi( mbedtls_mpi *Q, mbedtls_mpi *R, const mbedtls_mpi *A,
  *
  * \param Q        The destination MPI for the quotient.
  *                 This may be \c NULL if the value of the
- *                 quotient is not needed.
+ *                 quotient is not needed.  This must not alias A.
  * \param R        The destination MPI for the remainder value.
  *                 This may be \c NULL if the value of the
- *                 remainder is not needed.
+ *                 remainder is not needed.  This must not alias A.
  * \param A        The dividend. This must point to an initialized MPi.
  * \param b        The divisor.
  *
@@ -827,22 +886,23 @@ int mbedtls_mpi_mod_int( mbedtls_mpi_uint *r, const mbedtls_mpi *A,
                          mbedtls_mpi_sint b );
 
 /**
- * \brief          Perform a sliding-window exponentiation: X = A^E mod N
+ * \brief          Perform a modular exponentiation: X = A^E mod N
  *
  * \param X        The destination MPI. This must point to an initialized MPI.
+ *                 This must not alias E or N.
  * \param A        The base of the exponentiation.
  *                 This must point to an initialized MPI.
  * \param E        The exponent MPI. This must point to an initialized MPI.
  * \param N        The base for the modular reduction. This must point to an
  *                 initialized MPI.
- * \param _RR      A helper MPI depending solely on \p N which can be used to
+ * \param prec_RR  A helper MPI depending solely on \p N which can be used to
  *                 speed-up multiple modular exponentiations for the same value
  *                 of \p N. This may be \c NULL. If it is not \c NULL, it must
  *                 point to an initialized MPI. If it hasn't been used after
  *                 the call to mbedtls_mpi_init(), this function will compute
- *                 the helper value and store it in \p _RR for reuse on
+ *                 the helper value and store it in \p prec_RR for reuse on
  *                 subsequent calls to this function. Otherwise, the function
- *                 will assume that \p _RR holds the helper value set by a
+ *                 will assume that \p prec_RR holds the helper value set by a
  *                 previous call to mbedtls_mpi_exp_mod(), and reuse it.
  *
  * \return         \c 0 if successful.
@@ -854,7 +914,7 @@ int mbedtls_mpi_mod_int( mbedtls_mpi_uint *r, const mbedtls_mpi *A,
  */
 int mbedtls_mpi_exp_mod( mbedtls_mpi *X, const mbedtls_mpi *A,
                          const mbedtls_mpi *E, const mbedtls_mpi *N,
-                         mbedtls_mpi *_RR );
+                         mbedtls_mpi *prec_RR );
 
 /**
  * \brief          Fill an MPI with a number of random bytes.
@@ -876,6 +936,44 @@ int mbedtls_mpi_exp_mod( mbedtls_mpi *X, const mbedtls_mpi *A,
 int mbedtls_mpi_fill_random( mbedtls_mpi *X, size_t size,
                      int (*f_rng)(void *, unsigned char *, size_t),
                      void *p_rng );
+
+/** Generate a random number uniformly in a range.
+ *
+ * This function generates a random number between \p min inclusive and
+ * \p N exclusive.
+ *
+ * The procedure complies with RFC 6979 §3.3 (deterministic ECDSA)
+ * when the RNG is a suitably parametrized instance of HMAC_DRBG
+ * and \p min is \c 1.
+ *
+ * \note           There are `N - min` possible outputs. The lower bound
+ *                 \p min can be reached, but the upper bound \p N cannot.
+ *
+ * \param X        The destination MPI. This must point to an initialized MPI.
+ * \param min      The minimum value to return.
+ *                 It must be nonnegative.
+ * \param N        The upper bound of the range, exclusive.
+ *                 In other words, this is one plus the maximum value to return.
+ *                 \p N must be strictly larger than \p min.
+ * \param f_rng    The RNG function to use. This must not be \c NULL.
+ * \param p_rng    The RNG parameter to be passed to \p f_rng.
+ *
+ * \return         \c 0 if successful.
+ * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if a memory allocation failed.
+ * \return         #MBEDTLS_ERR_MPI_BAD_INPUT_DATA if \p min or \p N is invalid
+ *                 or if they are incompatible.
+ * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if the implementation was
+ *                 unable to find a suitable value within a limited number
+ *                 of attempts. This has a negligible probability if \p N
+ *                 is significantly larger than \p min, which is the case
+ *                 for all usual cryptographic applications.
+ * \return         Another negative error code on failure.
+ */
+int mbedtls_mpi_random( mbedtls_mpi *X,
+                        mbedtls_mpi_sint min,
+                        const mbedtls_mpi *N,
+                        int (*f_rng)(void *, unsigned char *, size_t),
+                        void *p_rng );
 
 /**
  * \brief          Compute the greatest common divisor: G = gcd(A, B)
@@ -904,42 +1002,11 @@ int mbedtls_mpi_gcd( mbedtls_mpi *G, const mbedtls_mpi *A,
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if a memory allocation failed.
  * \return         #MBEDTLS_ERR_MPI_BAD_INPUT_DATA if \p N is less than
  *                 or equal to one.
- * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p has no modular inverse
- *                 with respect to \p N.
+ * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p A has no modular
+ *                 inverse with respect to \p N.
  */
 int mbedtls_mpi_inv_mod( mbedtls_mpi *X, const mbedtls_mpi *A,
                          const mbedtls_mpi *N );
-
-#if !defined(MBEDTLS_DEPRECATED_REMOVED)
-#if defined(MBEDTLS_DEPRECATED_WARNING)
-#define MBEDTLS_DEPRECATED      __attribute__((deprecated))
-#else
-#define MBEDTLS_DEPRECATED
-#endif
-/**
- * \brief          Perform a Miller-Rabin primality test with error
- *                 probability of 2<sup>-80</sup>.
- *
- * \deprecated     Superseded by mbedtls_mpi_is_prime_ext() which allows
- *                 specifying the number of Miller-Rabin rounds.
- *
- * \param X        The MPI to check for primality.
- *                 This must point to an initialized MPI.
- * \param f_rng    The RNG function to use. This must not be \c NULL.
- * \param p_rng    The RNG parameter to be passed to \p f_rng.
- *                 This may be \c NULL if \p f_rng doesn't use a
- *                 context parameter.
- *
- * \return         \c 0 if successful, i.e. \p X is probably prime.
- * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if a memory allocation failed.
- * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p X is not prime.
- * \return         Another negative error code on other kinds of failure.
- */
-MBEDTLS_DEPRECATED int mbedtls_mpi_is_prime( const mbedtls_mpi *X,
-                          int (*f_rng)(void *, unsigned char *, size_t),
-                          void *p_rng );
-#undef MBEDTLS_DEPRECATED
-#endif /* !MBEDTLS_DEPRECATED_REMOVED */
 
 /**
  * \brief          Miller-Rabin primality test.
@@ -949,7 +1016,7 @@ MBEDTLS_DEPRECATED int mbedtls_mpi_is_prime( const mbedtls_mpi *X,
  *                 generate yourself and that are supposed to be prime, then
  *                 \p rounds should be at least the half of the security
  *                 strength of the cryptographic algorithm. On the other hand,
- *                 if \p X is chosen uniformly or non-adversially (as is the
+ *                 if \p X is chosen uniformly or non-adversarially (as is the
  *                 case when mbedtls_mpi_gen_prime calls this function), then
  *                 \p rounds can be much lower.
  *

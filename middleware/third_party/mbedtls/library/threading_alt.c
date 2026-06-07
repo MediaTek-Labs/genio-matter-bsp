@@ -31,7 +31,7 @@
  * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
  * MEDIATEK FOR SUCH MEDIATEK SOFTWARE AT ISSUE.
  */
-
+#include "common.h"
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
@@ -43,6 +43,8 @@
 #include "mbedtls/threading.h"
 
 #if defined(MBEDTLS_THREADING_ALT)
+
+#include "mbedtls/threading_alt.h"
 
 #ifdef MBEDTLS_MTK
 void (*mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_init_freertos;

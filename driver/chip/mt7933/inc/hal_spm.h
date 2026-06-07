@@ -44,6 +44,9 @@
 #define WAKEUP_PSRAM_MODE_VALUE(x)   (((x)& WAKEUP_PSRAM_MODE_MASK) >> WAKEUP_PSRAM_MODE_SHIFT)
 #define WAKEUP_XIP_BOOT              (0x1 << 11)
 
+#define SNFC_CG_DIS                  (SNFC_BASE + 0x728)
+#define SFC_SW_RST_DIS               BIT(2)
+
 #define EFUSE_GRP2_BLK_0                 (GRP2_EEF_TOP + 0x80)
 #define EFUSE_PSRAM_MODE_MASK        (BITS(8,10))
 #define EFUSE_PSRAM_MODE_SHIFT       (8)

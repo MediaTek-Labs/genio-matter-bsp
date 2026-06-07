@@ -3533,7 +3533,7 @@
  * 1: Put ram_heap into TCM
 */
 #ifndef LWIP_RAM_HEAP_LOCATION
-#ifdef MT7933
+#if (PRODUCT_VERSION == 7933)
 #define LWIP_RAM_HEAP_LOCATION		0
 #else
 #define LWIP_RAM_HEAP_LOCATION		1

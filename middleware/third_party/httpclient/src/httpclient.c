@@ -50,7 +50,7 @@ log_create_module(httpclient, PRINT_LEVEL_INFO);
 #define HTTPCLIENT_SEND_BUF_SIZE  512
 
 #define HTTPCLIENT_MAX_HOST_LEN   64
-#define HTTPCLIENT_MAX_URL_LEN    256
+#define HTTPCLIENT_MAX_URL_LEN    512
 
 #if defined(MBEDTLS_DEBUG_C)
 #define DEBUG_LEVEL 2
@@ -1125,7 +1125,7 @@ static int httpclient_ssl_conn(httpclient_t *client, char *host)
             goto exit;
         }
     
-        ret = mbedtls_pk_parse_key(&ssl->pkey, (const unsigned char *)client->client_pk, client->client_pk_len, NULL, 0);                 
+        ret = mbedtls_pk_parse_key(&ssl->pkey, (const unsigned char *)client->client_pk, client->client_pk_len, NULL, 0, mbedtls_ctr_drbg_random, &ssl->ctr_drbg);                 
         if (ret != 0) {
             DBG("failed! mbedtls_pk_parse_key returned -0x%x.", -ret);
             goto exit;
@@ -1166,7 +1166,7 @@ static int httpclient_ssl_conn(httpclient_t *client, char *host)
     }
 
     // TODO: add customerization encryption algorithm
-    memcpy(&ssl->profile, ssl->ssl_conf.cert_profile, sizeof(mbedtls_x509_crt_profile));    
+    memcpy(&ssl->profile, ssl->ssl_conf.MBEDTLS_PRIVATE(cert_profile), sizeof(mbedtls_x509_crt_profile));    
     ssl->profile.allowed_mds = ssl->profile.allowed_mds | MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_MD5);
     mbedtls_ssl_conf_cert_profile(&ssl->ssl_conf, &ssl->profile);
     

@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#include "mbedtls/certs.h"
+#include "mbedtls/old/certs.h"
 
 #if defined(MBEDTLS_CERTS_C)
 

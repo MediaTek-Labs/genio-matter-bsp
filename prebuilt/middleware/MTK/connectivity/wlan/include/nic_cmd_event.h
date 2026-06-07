@@ -1002,6 +1002,7 @@ enum {
 	MAC_INFO_TYPE_MIB = 0x3,
 	MAC_INFO_TYPE_EDCA = 0x4,
 	MAC_INFO_TYPE_WIFI_INT_CNT = 0x5,
+	MAC_INFO_TYPE_NEXT_TBTT = 0x06,
 };
 
 /*******************************************************************************
@@ -1895,6 +1896,22 @@ struct CMD_PS_PROFILE {
 	uint8_t ucPsProfile;
 	uint8_t aucReserved[2];
 };
+
+#if (CFG_SUPPORT_TSF_SYNC == 1)
+struct CMD_TSF_SYNC {
+	/* DWORD_0 - Common Part */
+	uint8_t  ucCmdVer;
+	uint8_t  aucPadding0[1];
+	uint16_t u2CmdLen;       /* cmd size including common part and body. */
+
+	/* DWORD_1 ~ x - Command Body */
+	uint64_t u8TsfValue;
+	uint8_t fgIsLatch;
+	uint8_t ucBssIndex;
+	uint8_t aucReserved[2];
+};
+#endif
+
 
 #if CFG_SUPPORT_P2P_RSSI_QUERY
 /* EVENT_LINK_QUALITY */
@@ -3397,8 +3414,14 @@ struct _EXTRA_ARG_TSF_T {
 	uint8_t  aucReserved[3];
 };
 
+struct _EXTRA_ARG_NextTbtt_T {
+	uint8_t  ucHwBssidIndex;
+	uint8_t  aucReserved[3];
+};
+
 union _EXTRA_ARG_MAC_INFO_T {
 	struct _EXTRA_ARG_TSF_T rTsfArg;
+	struct _EXTRA_ARG_NextTbtt_T rNextTbtt;
 };
 
 struct _EXT_CMD_GET_MAC_INFO_T {
@@ -3413,8 +3436,14 @@ struct TSF_RESULT_T {
 	uint32_t u4TsfBitsHigh;
 };
 
+struct NEXT_TBTT_RESULT_T {
+	uint32_t u4TsfBitsLow;
+	uint32_t u4TsfBitsHigh;
+};
+
 union MAC_INFO_RESULT_T {
 	struct TSF_RESULT_T rTsfResult;
+	struct NEXT_TBTT_RESULT_T rNextTbttResult;
 };
 
 struct EXT_EVENT_MAC_INFO_T {
@@ -3876,6 +3905,12 @@ void nicCmdEventQueryTxMcsInfo(IN struct ADAPTER *prAdapter,
 void nicEventTxMcsInfo(IN struct ADAPTER *prAdapter,
 		IN struct WIFI_EVENT *prEvent);
 #endif
+
+#if (CFG_SUPPORT_TSF_SYNC == 1)
+void nicCmdEventLatchTSF(IN struct ADAPTER *prAdapter,
+	IN struct CMD_INFO *prCmdInfo, IN uint8_t *pucEventBuf);
+#endif
+
 
 /*******************************************************************************
  *                              F U N C T I O N S

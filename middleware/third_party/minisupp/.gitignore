@@ -1,8 +1,32 @@
+# Ignore Python compiled files
 *.pyc
+
+# Ignore backup files usually created by text editors
 *~
-tests/hwsim/logs
-tests/remote/logs
+
+# Ignore specific logs directories
+tests/hwsim/logs/
+tests/remote/logs/
+
+# Ignore the build directory of wpaspy
 wpaspy/build
+
+# Ignore log files from parallel virtual machines
 **/parallel-vm.log
+
+# Exclude a tags file
 tags
+
+# Exclude a build directory
 build/
+
+# Ignore a specific configuration file
+src_protected/wpa_supplicant_2.10/wpa_supplicant/.config
+
+# Ignore all swap (.swp) files. These are temporary files 
+# which can be created while editing a file in Vim
+*.swp
+
+.coverity
+
+GCC/Build/

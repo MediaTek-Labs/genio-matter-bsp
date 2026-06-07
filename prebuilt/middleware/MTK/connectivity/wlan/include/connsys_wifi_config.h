@@ -183,9 +183,12 @@
 #if defined(MTK_RELEASE_MODE)
 #define CFG_SUPPORT_NON_PREF_CHAN  0
 #define CFG_SUPPORT_11KV_SWITCH    0
+#define CFG_SUPPORT_REG_RULES      0
 #else
 #define CFG_SUPPORT_NON_PREF_CHAN  1
 #define CFG_SUPPORT_11KV_SWITCH    1
+#define CFG_SUPPORT_REG_RULES      1
+
 #endif
 
 /*
@@ -672,7 +675,7 @@
  *------------------------------------------------------------------------------
  */
 /*! Maximum number of BSS in the SCAN list */
-#define CFG_MAX_NUM_BSS_LIST                    8
+#define CFG_MAX_NUM_BSS_LIST                    32
 
 #define CFG_MAX_COMMON_IE_BUF_LEN         ((1500 * CFG_MAX_NUM_BSS_LIST) / 3)
 
@@ -1745,6 +1748,31 @@
 #else
 #define CFG_SUPPORT_ANT_DIV         1
 #endif
+
+
+#ifndef CFG_TWT_STA_DIRECT_TEARDOWN
+#define CFG_TWT_STA_DIRECT_TEARDOWN 0
+#endif
+
+/*------------------------------------------------------------------------------
+  * Flags of customized scan channel time
+ *------------------------------------------------------------------------------
+ */
+#if defined(MTK_RELEASE_MODE)
+#define CFG_SUPPORT_SCAN_CH_TIME         0
+#else
+#define CFG_SUPPORT_SCAN_CH_TIME         1
+#endif
+
+#ifndef CFG_SUPPORT_PRIV_P2P_GC
+#define CFG_SUPPORT_PRIV_P2P_GC         0
+#endif
+
+/*------------------------------------------------------------------------------
+ * Flags of customized EDCCA threshold
+ *------------------------------------------------------------------------------
+ */
+#define CFG_SUPPORT_EDCCA_TH_CUSTOMIZED         1
 
 /*******************************************************************************
  *                             D A T A   T Y P E S

@@ -308,6 +308,9 @@ enum ENUM_CMD_ID {
 	CMD_ID_SET_OSHARE_MODE = 0x8E,
 	CMD_ID_RDD_ON_OFF_CTRL = 0x8F,      /* 0x8F(Set) */
 	CMD_ID_SET_ICS_SNIFFER = 0x93,
+#if (CFG_SUPPORT_TSF_SYNC == 1)
+	CMD_ID_BEACON_TSF_SYNC = 0x94,      /* 0x94 (Set / Query) */
+#endif
 	CMD_ID_WFC_KEEP_ALIVE = 0xA0,       /* 0xA0 (Set) */
 	CMD_ID_RSSI_MONITOR = 0xA1,         /* 0xA1 (Set) */
 	CMD_ID_CAL_BACKUP_IN_HOST_V2 = 0xAE,    /* 0xAE (Set / Query) */
@@ -488,6 +491,9 @@ enum ENUM_EVENT_ID {
 	EVENT_ID_TDLS = 0x80,
 	EVENT_ID_LOG_UI_INFO  = 0x8D,           /* 0x8D (Set / Query) */
 	EVENT_ID_UPDATE_COEX_PHYRATE = 0x90,    /* 0x90 (Unsolicited) */
+#if (CFG_SUPPORT_TSF_SYNC == 1)
+	EVENT_ID_BEACON_TSF_SYNC = 0x94,		/* 0x94 (Set / Query) */
+#endif
 	EVENT_ID_RSSI_MONITOR = 0xA1,       /* Event ID for Rssi monitoring */
 	EVENT_ID_CAL_BACKUP_IN_HOST_V2 = 0xAE,
 	/* 0xAE (Query - CMD_ID_CAL_BACKUP) */
@@ -972,7 +978,11 @@ struct CMD_UPDATE_STA_RECORD {
 	uint16_t u2HeRxMcsMapBW80P80;
 	uint16_t u2HeTxMcsMapBW80P80;
 #endif
-	uint8_t  aucPadding4[32];
+	uint8_t  aucPadding4[2];
+	uint8_t  ucSapRemoveDisable;
+	uint8_t  aucPadding5[1];
+
+	uint8_t  aucPadding6[28];
 };
 
 struct CMD_REMOVE_STA_RECORD {

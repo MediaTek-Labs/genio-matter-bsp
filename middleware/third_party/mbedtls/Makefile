@@ -34,7 +34,7 @@
 
 SOURCE_DIR = ../../..
 BINPATH     = ~/gcc-arm-none-eabi/bin
-PROJ_PATH = ../../../project/mt7687_hdk/apps/iot_sdk/GCC
+PROJ_PATH = ../../../project/mt7933_hdk/apps/mbedtls/GCC
 CONFIG_PATH ?= .
 
 CFLAGS += -I$(PROJ_PATH)/../inc

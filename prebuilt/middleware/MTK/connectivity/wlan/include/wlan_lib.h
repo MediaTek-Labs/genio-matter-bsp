@@ -646,6 +646,7 @@ struct _TWT_CTRL_T {
 	uint8_t ucCtrlAction;
 	uint8_t ucTWTFlowId;
 	struct _TWT_PARAMS_T rTWTParams;
+	struct _NEXT_TWT_INFO_T rNextTWT;
 };
 
 struct _TWT_GET_TSF_CONTEXT_T {
@@ -654,6 +655,7 @@ struct _TWT_GET_TSF_CONTEXT_T {
 	uint8_t ucTWTFlowId;
 	uint8_t fgIsOid;
 	struct _TWT_PARAMS_T rTWTParams;
+	struct _NEXT_TWT_INFO_T rNextTWT;
 };
 
 #endif
@@ -1647,6 +1649,9 @@ uint32_t wlanCfgSetCb(IN struct ADAPTER *prAdapter, const int8_t *pucKey,
 
 void wlanFeatureToFw(IN struct ADAPTER *prAdapter);
 #endif
+
+void wlanCfgStoreCoexSubMode(IN uint8_t ucCoexSubMode);
+void wlanCfgSetCoexSubMode(IN struct ADAPTER *prAdapter);
 
 uint32_t wlanCfgInit(IN struct ADAPTER *prAdapter, uint8_t *pucConfigBuf,
 		     uint32_t u4ConfigBufLen, uint32_t u4Flags);

@@ -6226,6 +6226,92 @@ int mtk_supplicant_set_pmk(uint8_t port, uint8_t *pmk);
 
 int mtk_supplicant_get_pmk(uint8_t port, uint8_t *pmk);
 
+/*
+	Set the user Id in the supplicant for EAP authentication method (Used in WPA/WPA2-Enterprise)
+	@param port: The port for this operation
+	@param userIdStr[IN]: User ID to set
+	@param userIdLen: Length of user ID string
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_set_eap_user_id(uint8_t port, uint8_t *user_id_str,
+					uint32_t user_id_len);
+
+/*
+	Get the user Id from the supplicant for EAP authentication method (Used in WPA/WPA2-Enterprise)
+	@param port: Port for this operation
+	@param userIdBuf[OUT]: Buffer to store fetched user ID string
+	@param [InOut]: On input, it's max length that can be stored. On output, it's the actual length copied
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_get_eap_user_id(uint8_t port, uint8_t *user_id_buf,
+					uint32_t *user_id_len);
+
+/*
+	Set the User password in the supplicant for EAP authentication method (Used in WPA/WPA2-Enterprise)
+	@param port: Port for this operation
+	@param pwdStr[IN]: Password to be set
+	@param pwdLen: Length of password string
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_set_eap_user_pwd(uint8_t port, uint8_t *pwd_str,
+					uint32_t pwd_len);
+
+/*
+	Get the User password from the supplicant for EAP authentication method (Used in WPA/WPA2-Enterprise)
+	@param port: Port for this operation
+	@param pwdBuf[OUT]: Buffer where password string will be stored
+	@param pwdLen[InOut]: On input, it's the max length that can be stored. On output, it's the actual length stored
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_get_eap_user_pwd(uint8_t port, uint8_t *pwd_buf,
+					uint32_t *pwd_len);
+
+/*
+	Assigns EAP method for authentication purposes
+	@param port: The port on which this operation is to be done
+	@param mtkEapType: Type of EAP to utilize
+	@return int: success or failure code
+*/
+int mtk_supplicant_set_eap_type(uint8_t port, uint8_t mtk_eap_type);
+
+/*
+	Acquires the currently set EAP method
+	@param port: The port from where we fetch the EAP type
+	@param mtkEapType[OUT]: Will store the type of EAP in use upon return
+	@return int: success or failure code
+*/
+int mtk_supplicant_get_eap_type(uint8_t port, uint8_t *mtk_eap_type);
+			
+/*
+	Used to load certificate data for authentication
+	@param port: Port on which this operation is conducted
+	@param certType: Type of certificate being loaded
+	@param startAddr: Starting address of the certificate in memory
+	@param length: Length of the certificate binary in bytes
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_set_load_cert(uint8_t port, uint8_t cert_type, uint32_t start_addr, uint32_t length);
+
+/*
+	Client private  key password for EAP authentication 
+	@param port: Port on which this operation is conducted
+	@param key_pwdStr[IN]: Password string to be set
+	@param key_pwdLen: Length of provided password string
+	@return int: Returns a success or failure code
+*/
+int mtk_supplicant_set_eap_key_pwd(uint8_t port, uint8_t *key_pwd_str,
+				   uint32_t key_pwd_len);
+
+/*
+	Client private key password for EAP authentication and store into provided buffer
+	@param port: Port on which operation is conducted
+	@param key_pwdBuf[OUT]: Buffer where PSK password is stored
+	@param key_pwdLen[InOut]: On input, max length that can be stored; on output, actual length stored
+	@return int: Returns a success or failure code             
+*/
+int mtk_supplicant_get_eap_key_pwd(uint8_t port, uint8_t *key_pwd_buf,
+				   uint32_t *key_pwd_len);
+
 int mtk_supplicant_set_wep_key(uint8_t port, wifi_wep_key_t *wep_keys);
 
 int mtk_supplicant_get_wep_key(uint8_t port, wifi_wep_key_t *wep_keys);
@@ -6410,4 +6496,18 @@ extern uint8_t g_ap_created;
 void mtk_freertos_api2supp_semphr_take(void);
 
 int mtk_supplicant_is_connect_ft_ap(void);
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+int mtk_supplicant_p2p_connect(char *cmd);
+int mtk_supplicant_p2p_group_remove(void);
+int32_t mtk_supplicant_p2p_find(int freq, int timeout_sec,
+			char *seek_mac, int find_type, int search_delay_ms);
+int32_t mtk_supplicant_p2p_stop_find(void);
+int32_t mtk_supplicant_p2p_set_sd_req(char *reply, int reply_len,
+			char *sd_mac, char *req_buff);
+int32_t mtk_supplicant_p2p_cancel_sd_req(const char* req_id);
+int32_t mtk_supplicant_p2p_flush(void);
+int32_t mtk_supplicant_p2p_cancel_connect(void);
+uint8_t mtk_supplicant_p2p_select_network(void);
+#endif
+
 #endif /* DRIVER_H */

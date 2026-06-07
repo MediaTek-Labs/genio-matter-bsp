@@ -87,6 +87,11 @@
 #define WDT_MODE_OFFSET            (0x30)
 #define WDT_SWINT_ADDR             (WDT_REG_BASE + 0x80)
 
+/* WDT_CHIP_VER */
+#define WDT_CHIP_VER_1             (0x8A00)
+#define WDT_CHIP_VER_2             (0x8A10)
+#define WDT_CHIP_VER_3             (0x8A11)
+#define WDT_CHIP_VER_4             (0x8A12)
 
 /** @defgroup _WDT_TypeDef Struct
   * @{
@@ -153,4 +158,5 @@ uint32_t wdt_get_status(void);
 void wdt_dump_info(void);
 void wdt_sw_set_hw_reboot(void);
 void wdt_sw_clr_sw_reboot(void);
+bool wdt_sta_check_hw_ver(void);
 #endif /* #ifndef __WDT_H__ */

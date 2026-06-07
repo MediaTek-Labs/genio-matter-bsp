@@ -17,6 +17,7 @@
 #include "lwip/sockets.h"
 #endif
 #include "mbedtls/debug.h"
+#include "mbedtls/ctr_drbg.h"
 #define DEBUG_LEVEL 3
 #define CLK32_TICK_TO_MS (32)
 
@@ -389,10 +390,12 @@ int mqtt_ssl_client_init(mbedtls_ssl_context *ssl,
 #if defined(MBEDTLS_DEBUG_C)
     mbedtls_debug_set_threshold(DEBUG_LEVEL);
 #endif
+    mbedtls_ctr_drbg_context ctr_drbg;
     mbedtls_net_init( tcp_fd );
     mbedtls_ssl_init( ssl );
     mbedtls_ssl_config_init( conf );
     mbedtls_x509_crt_init(crt509_ca);
+    mbedtls_ctr_drbg_init(&ctr_drbg);
 
     /*verify_source->trusted_ca_crt==NULL
      * 0. Initialize certificates
@@ -434,7 +437,8 @@ int mqtt_ssl_client_init(mbedtls_ssl_context *ssl,
         MQTT_DBG("start mbedtls_pk_parse_key[%s]", cli_pwd);
         ret = mbedtls_pk_parse_key( pk_cli,
                                     (const unsigned char *) cli_key, key_len,
-                                    (const unsigned char *) cli_pwd, pwd_len);
+                                    (const unsigned char *) cli_pwd, pwd_len
+                                    , mbedtls_ctr_drbg_random, &ctr_drbg);
 #else
         {
             ret = 1;
@@ -538,7 +542,7 @@ void mqtt_ssl_disconnect(Network *n)
     mbedtls_net_free(&(n->fd));
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     mbedtls_x509_crt_free( &(n->cacertl));
-    if ((n->pkey).pk_info != NULL) {
+    if ((n->pkey).MBEDTLS_PRIVATE(pk_info) != NULL) {
         MQTT_DBG("mqtt need free client crt&key");
         mbedtls_x509_crt_free( &(n->clicert));
         mbedtls_pk_free( &(n->pkey) );

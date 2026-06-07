@@ -340,6 +340,27 @@ extern "C" {
 */
 #define WIFI_IOT_COMMAND_CONFIG_BANDWIDTH_40MHZ (0x01)
 
+/**@brief TWT get parameter success.
+*/
+#define WIFI_TWT_GET_SUCCESS                      (0)
+
+/**@brief TWT get parameter fail due to fail to create TWT with AP
+*/
+#define WIFI_TWT_GET_FAIL_CREATE_FAIL             (-1)
+
+/**@brief TWT get parameter fail due to peer AP not support TWT
+*/
+#define WIFI_TWT_GET_FAIL_PEER_NOT_SUPPORT        (-2)
+
+/**@brief TWT get parameter fail due to not request to enable TWT by API yet
+*/
+#define WIFI_TWT_GET_FAIL_NOT_ENABLE              (-3)
+
+/**@brief TWT get parameter fail due to invalid input parameter
+*/
+#define WIFI_TWT_GET_FAIL_INVALID_PARAM           (-4)
+
+
 /**@brief Specifies 20MHz | 40MHz bandwidth in the 2.4GHz band.
 */
 #ifndef WIFI_IOT_COMMAND_CONFIG_BANDWIDTH_2040MHZ
@@ -456,8 +477,30 @@ typedef enum {
 	   #wifi_flow_control_event_t. */
 	WIFI_EVENT_IOT_CSI_DATA_NOTIFICATION,
 	/**<  Notify the application to collect csi raw data. */
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+	WIFI_EVENT_IOT_P2P_EVENT,
+#endif
 	WIFI_EVENT_MAX_NUMBER
 } wifi_event_t;
+
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+enum p2p_sub_event {
+	P2P_DEV_FOUND = 8, /**< p2p device found event. */
+	P2P_RECV_SD_REP, /**< p2p receive service discovery response event*/
+	P2P_WPS_FAILED, /**< p2p WPS failed event. */
+	P2P_WPS_SEND_M2D, /**< pin code error. */
+	P2P_GROUP_STARTED, /**< p2p group started event. */
+	P2P_GROUP_FORMATION_FAILURE, /**< p2p group formation failure event. */
+	P2P_GROUP_REMOVED, /**< p2p group removed event. */
+};
+
+struct p2p_event_data {
+	enum p2p_sub_event p2pId;
+	char addr[18];
+	char *data;
+	uint32_t dataLen;
+};
+#endif
 
 /** @brief This enumeration defines the reason code of the
 * WIFI_EVENT_IOT_CONNECTION_FAILED event in #wifi_event_t.

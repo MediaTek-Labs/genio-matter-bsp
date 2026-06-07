@@ -31,6 +31,8 @@
  * @brief PSA based PKCS#11 implementation.
  */
 
+//#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 /* C runtime includes. */
 #include <stdio.h>
 #include <string.h>
@@ -49,12 +51,16 @@
 #include "psa/crypto_values.h"
 
 /* mbedTLS includes. */
+//#include "mbedtls/compat-1.3.h"
 #include "mbedtls/pk.h"
-#include "mbedtls/pk_internal.h"
+//#include "mbedtls/pk_internal.h"
 
 #define PKCS11_PRINT( X )            LogInfo( X )
 #define PKCS11_WARNING_PRINT( X )    LogWarn( X )
 #define pkcs11NO_OPERATION           ( ( CK_MECHANISM_TYPE ) 0xFFFFFFFFUL )
+
+extern const mbedtls_pk_info_t mbedtls_rsa_info;
+extern const mbedtls_pk_info_t mbedtls_eckey_info;
 
 /*
  * The length of the content of an ECPoint n uncompressed
@@ -547,7 +553,7 @@ CK_RV prvCreateEcPrivateKey( mbedtls_pk_context * pxMbedContext,
     *ppxClass = NULL;
 
     /* Key will be assembled in the mbedTLS key context and then exported to DER for storage. */
-    mbedtls_ecp_keypair * pxKeyPair = ( mbedtls_ecp_keypair * ) pxMbedContext->pk_ctx;
+    mbedtls_ecp_keypair * pxKeyPair = ( mbedtls_ecp_keypair * ) pxMbedContext->MBEDTLS_PRIVATE(pk_ctx);
 
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
@@ -611,7 +617,7 @@ CK_RV prvCreateEcPrivateKey( mbedtls_pk_context * pxMbedContext,
                 break;
 
             case ( CKA_VALUE ):
-                lMbedReturn = mbedtls_mpi_read_binary( &pxKeyPair->d,
+                lMbedReturn = mbedtls_mpi_read_binary( &pxKeyPair->MBEDTLS_PRIVATE(d),
                                                        xAttribute.pValue,
                                                        xAttribute.ulValueLen );
 
@@ -649,8 +655,8 @@ CK_RV prvCreateRsaPrivateKey( mbedtls_pk_context * pxMbedContext,
 
     *ppxLabel = NULL;
     *ppxClass = NULL;
-    pxRsaContext = pxMbedContext->pk_ctx;
-    mbedtls_rsa_init( pxRsaContext, MBEDTLS_RSA_PKCS_V15, 0 /*ignored.*/ );
+    pxRsaContext = pxMbedContext->MBEDTLS_PRIVATE(pk_ctx);
+    mbedtls_rsa_init( pxRsaContext );
 
     /* Parse template and collect the relevant parts. */
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
@@ -751,15 +757,15 @@ CK_RV prvCreateRsaPrivateKey( mbedtls_pk_context * pxMbedContext,
                 break;
 
             case ( CKA_EXPONENT_1 ):
-                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->DP, xAttribute.pValue, xAttribute.ulValueLen );
+                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(DP), xAttribute.pValue, xAttribute.ulValueLen );
                 break;
 
             case ( CKA_EXPONENT_2 ):
-                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->DQ, xAttribute.pValue, xAttribute.ulValueLen );
+                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(DQ), xAttribute.pValue, xAttribute.ulValueLen );
                 break;
 
             case ( CKA_COEFFICIENT ):
-                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->QP, xAttribute.pValue, xAttribute.ulValueLen );
+                lMbedReturn = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(QP), xAttribute.pValue, xAttribute.ulValueLen );
                 break;
 
             default:
@@ -804,8 +810,8 @@ CK_RV prvCreatePrivateKey( CK_ATTRIBUTE_PTR pxTemplate,
 
         if( pxRsaCtx != NULL )
         {
-            xMbedContext.pk_ctx = pxRsaCtx;
-            xMbedContext.pk_info = &mbedtls_rsa_info;
+            xMbedContext.MBEDTLS_PRIVATE(pk_ctx) = pxRsaCtx;
+            xMbedContext.MBEDTLS_PRIVATE(pk_info) = &mbedtls_rsa_info;
             xResult = prvCreateRsaPrivateKey( &xMbedContext,
                                               &pxLabel,
                                               &pxClass,
@@ -837,14 +843,14 @@ CK_RV prvCreatePrivateKey( CK_ATTRIBUTE_PTR pxTemplate,
             if( pxKeyPair != NULL )
             {
                 /* Initialize the info. */
-                xMbedContext.pk_info = &mbedtls_eckey_info;
+                xMbedContext.MBEDTLS_PRIVATE(pk_info) = &mbedtls_eckey_info;
 
                 /* Initialize the context. */
-                xMbedContext.pk_ctx = pxKeyPair;
+                xMbedContext.MBEDTLS_PRIVATE(pk_ctx) = pxKeyPair;
                 mbedtls_ecp_keypair_init( pxKeyPair );
-                mbedtls_ecp_group_init( &pxKeyPair->grp );
+                mbedtls_ecp_group_init( &pxKeyPair->MBEDTLS_PRIVATE(grp) );
                 /*/ * At this time, only P-256 curves are supported. * / */
-                mbedtls_ecp_group_load( &pxKeyPair->grp, MBEDTLS_ECP_DP_SECP256R1 );
+                mbedtls_ecp_group_load( &pxKeyPair->MBEDTLS_PRIVATE(grp), MBEDTLS_ECP_DP_SECP256R1 );
             }
             else
             {
@@ -937,7 +943,7 @@ CK_RV prvCreateECPublicKey( mbedtls_pk_context * pxMbedContext,
     *ppxClass = NULL;
 
     /* Key will be assembled in the mbedTLS key context and then exported to DER for storage. */
-    mbedtls_ecp_keypair * pxKeyPair = ( mbedtls_ecp_keypair * ) pxMbedContext->pk_ctx;
+    mbedtls_ecp_keypair * pxKeyPair = ( mbedtls_ecp_keypair * ) pxMbedContext->MBEDTLS_PRIVATE(pk_ctx);
 
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
@@ -1000,7 +1006,7 @@ CK_RV prvCreateECPublicKey( mbedtls_pk_context * pxMbedContext,
 
             case ( CKA_EC_POINT ):
                 /* The first 2 bytes are for ASN1 type/length encoding. */
-                lMbedReturn = mbedtls_ecp_point_read_binary( &pxKeyPair->grp, &pxKeyPair->Q, ( ( uint8_t * ) ( xAttribute.pValue ) + 2 ), ( xAttribute.ulValueLen - 2 ) );
+                lMbedReturn = mbedtls_ecp_point_read_binary( &pxKeyPair->MBEDTLS_PRIVATE(grp), &pxKeyPair->MBEDTLS_PRIVATE(Q), ( ( uint8_t * ) ( xAttribute.pValue ) + 2 ), ( xAttribute.ulValueLen - 2 ) );
 
                 if( lMbedReturn != 0 )
                 {
@@ -1135,15 +1141,15 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_EXPONENT_1 ):
-            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->DP, pxAttribute->pValue, pxAttribute->ulValueLen );
+            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(DP), pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
 
         case ( CKA_EXPONENT_2 ):
-            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->DQ, pxAttribute->pValue, pxAttribute->ulValueLen );
+            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(DQ), pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
 
         case ( CKA_COEFFICIENT ):
-            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->QP, pxAttribute->pValue, pxAttribute->ulValueLen );
+            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->MBEDTLS_PRIVATE(QP), pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
 
         default:
@@ -1290,9 +1296,9 @@ CK_RV prvCreatePublicKey( CK_ATTRIBUTE_PTR pxTemplate,
         pxRsaCtx = pvPortMalloc( sizeof( mbedtls_rsa_context ) );
         if( pxRsaCtx != NULL )
         {
-            xMbedContext.pk_ctx = pxRsaCtx;
-            xMbedContext.pk_info = &mbedtls_rsa_info;
-            mbedtls_rsa_init( pxRsaCtx, MBEDTLS_RSA_PKCS_V15, 0 /*ignored.*/ );
+            xMbedContext.MBEDTLS_PRIVATE(pk_ctx) = pxRsaCtx;
+            xMbedContext.MBEDTLS_PRIVATE(pk_info) = &mbedtls_rsa_info;
+            mbedtls_rsa_init( pxRsaCtx );
         }
         else
         {
@@ -1305,7 +1311,7 @@ CK_RV prvCreatePublicKey( CK_ATTRIBUTE_PTR pxTemplate,
             /* Parse template and collect the relevant parts. */
             for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
             {
-                xResult = prvRsaKeyAttParse( &pxTemplate[ ulIndex ], xMbedContext.pk_ctx,
+                xResult = prvRsaKeyAttParse( &pxTemplate[ ulIndex ], xMbedContext.MBEDTLS_PRIVATE(pk_ctx),
                                 &pxLabel, &pxClass, CK_FALSE );
                 if( xResult != CKR_OK )
                 {
@@ -1333,14 +1339,14 @@ CK_RV prvCreatePublicKey( CK_ATTRIBUTE_PTR pxTemplate,
             if( pxKeyPair != NULL )
             {
                 /* Initialize the info. */
-                xMbedContext.pk_info = &mbedtls_eckey_info;
+                xMbedContext.MBEDTLS_PRIVATE(pk_info) = &mbedtls_eckey_info;
 
                 /* Initialize the context. */
-                xMbedContext.pk_ctx = pxKeyPair;
+                xMbedContext.MBEDTLS_PRIVATE(pk_ctx) = pxKeyPair;
                 mbedtls_ecp_keypair_init( pxKeyPair );
-                mbedtls_ecp_group_init( &pxKeyPair->grp );
+                mbedtls_ecp_group_init( &pxKeyPair->MBEDTLS_PRIVATE(grp) );
                 /*/ * At this time, only P-256 curves are supported. * / */
-                mbedtls_ecp_group_load( &pxKeyPair->grp, MBEDTLS_ECP_DP_SECP256R1 );
+                mbedtls_ecp_group_load( &pxKeyPair->MBEDTLS_PRIVATE(grp), MBEDTLS_ECP_DP_SECP256R1 );
             }
             else
             {

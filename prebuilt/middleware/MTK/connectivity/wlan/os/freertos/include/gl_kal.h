@@ -93,7 +93,12 @@
 #endif
 
 #if DBG || (CONFIG_WIFI_MEM_DBG == 1)
-extern int allocatedMemSize;
+extern uint32_t allocatedMemSize;
+extern uint8_t g_AddrAllocatedUsed[256];
+extern uint32_t g_AddrAllocatedSize[256];
+extern uint32_t g_AddrAllocated[256];
+extern uint8_t g_AddrAllocatedi;
+
 #endif
 
 extern SemaphoreHandle_t g_halt_sem;
@@ -615,16 +620,26 @@ static inline void kalCfg80211ScanDone(void *request,
 #define in_interrupt()		false
 
 #if DBG || (CONFIG_WIFI_MEM_DBG == 1)
-#define kmalloc(size)		kalMemAlloc(size, 0)
-#define vmalloc(size)		kalMemAlloc(size, 0)
-#define kmalloc_DMA(size, mode)		({    \
+#define kmalloc(__size)		kalMemAlloc(__size, 0)
+#define vmalloc(__size)		kalMemAlloc(__size, 0)
+#define kmalloc_DMA(__size, __mode) ({ \
 	void *pvAddr; \
-	pvAddr = pvPortMallocNC(size);   \
-	if (pvAddr) {   \
-		allocatedMemSize += u4Size;   \
-		LOG_FUNC("0x%p(%ld) allocated DMA (%s:%s)\r\n", \
-		    pvAddr, (uint32_t)u4Size, __FILE__, __func__);  \
-	}   \
+	pvAddr = SYS_MALLOC_NC(__size); \
+	if (pvAddr) { \
+		taskENTER_CRITICAL(); \
+		allocatedMemSize += __size; \
+		g_AddrAllocatedUsed[g_AddrAllocatedi] = 1; \
+		g_AddrAllocated[g_AddrAllocatedi] = (uint32_t)pvAddr; \
+		g_AddrAllocatedSize[g_AddrAllocatedi] = __size; \
+		while (g_AddrAllocatedUsed[g_AddrAllocatedi] == 1) { \
+			g_AddrAllocatedi++; \
+		} \
+		taskEXIT_CRITICAL(); \
+		DBGLOG(INIT, WARN, \
+			">>> %p(%ld) allocated DMA (%s) usage[%d|%d]\r\n", \
+			pvAddr, (uint32_t)__size, __func__, g_AddrAllocatedi, \
+			g_AddrAllocatedUsed[g_AddrAllocatedi]); \
+	} \
 	pvAddr; \
 })
 
@@ -637,21 +652,32 @@ static inline void kalCfg80211ScanDone(void *request,
 
 
 #if DBG || (CONFIG_WIFI_MEM_DBG == 1)
-#define kalMemAlloc(u4Size, eMemType) ({    \
+#define kalMemAlloc(__u4Size, __eMemType) ({ \
 	void *pvAddr; \
 	size_t usize = xPortGetFreeHeapSize(); \
-	pvAddr = pvPortMalloc(u4Size);   \
-	if (pvAddr) {   \
-		allocatedMemSize += u4Size;   \
-		LOG_FUNC("0x%p(%ld) allocated (%s:%s)\r\n", \
-		    pvAddr, (uint32_t)u4Size, __FILE__, __func__);  \
-	}   \
-	LOG_FUNC("before_alloc(%d) rem(%d)\n", \
-		usize, xPortGetFreeHeapSize()); \
+	pvAddr = SYS_MALLOC(__u4Size); \
+	if (pvAddr) { \
+		taskENTER_CRITICAL(); \
+		allocatedMemSize += __u4Size; \
+		g_AddrAllocatedUsed[g_AddrAllocatedi] = 1; \
+		g_AddrAllocated[g_AddrAllocatedi] = (uint32_t)pvAddr; \
+		g_AddrAllocatedSize[g_AddrAllocatedi] = __u4Size; \
+		while (g_AddrAllocatedUsed[g_AddrAllocatedi] == 1) { \
+			g_AddrAllocatedi++; \
+		} \
+		taskEXIT_CRITICAL(); \
+		DBGLOG(INIT, WARN, \
+			">>> %p(%ld) allocated in (%s) usage[%d|%d]\r\n", \
+			pvAddr, (uint32_t)__u4Size, __func__, \
+			g_AddrAllocatedi, \
+			g_AddrAllocatedUsed[g_AddrAllocatedi]); \
+	} \
+	DBGLOG(INIT, WARN, ">>> >>> before_alloc(%d) rem(%d) size[%d|%d]\n", \
+		usize, xPortGetFreeHeapSize(), __u4Size, allocatedMemSize); \
 	pvAddr; \
 })
 #else
-#define kalMemAlloc(u4Size, eMemType) vmalloc(u4Size)
+#define kalMemAlloc(__u4Size, __eMemType) vmalloc(__u4Size)
 #endif
 
 
@@ -669,9 +695,24 @@ static inline void kalCfg80211ScanDone(void *request,
 #if DBG || (CONFIG_WIFI_MEM_DBG == 1)
 #define kfree(pvAddr) kalMemFree(pvAddr, 0, 0)
 #define vfree(pvAddr) kalMemFree(pvAddr, 0, 0)
-#define kfree_DMA(pvAddr)  ({\
-	vPortFreeNC(pvAddr);\
-	DBGLOG(INIT, ERROR, "[DMA] free addr = 0x%x\n", pvAddr);\
+#define kfree_DMA(pvAddr)  ({ \
+	SYS_FREE_NC(pvAddr); \
+	int idx; \
+	uint32_t used = 0; \
+	taskENTER_CRITICAL(); \
+	for (idx = 0; idx < 256; idx++) { \
+		if (g_AddrAllocatedUsed[idx] == 1 && \
+			g_AddrAllocated[idx] == (uint32_t)pvAddr) { \
+			g_AddrAllocatedUsed[idx] = 0; \
+			used = g_AddrAllocatedSize[idx]; \
+			g_AddrAllocatedSize[idx] = 0; \
+			break; \
+		} \
+	} \
+	allocatedMemSize -= used; \
+	taskEXIT_CRITICAL(); \
+	DBGLOG(INIT, WARN, "<<< [DMA] free addr = 0x%x, size[%d|%d]\n", \
+		pvAddr, used, allocatedMemSize);\
 })
 
 #else
@@ -681,22 +722,30 @@ static inline void kalCfg80211ScanDone(void *request,
 #endif
 
 #if DBG || (CONFIG_WIFI_MEM_DBG == 1)
-#define kalMemFree(pvAddr, eMemType, u4Size)  \
-{   \
+#define kalMemFree(pvAddr, eMemType, u4Size) \
+{ \
 	size_t usize = xPortGetFreeHeapSize(); \
-	if (pvAddr) {   \
-		allocatedMemSize -= u4Size; \
-		LOG_FUNC("0x%p(%ld) freed (%s:%s)\n", \
-			pvAddr, (uint32_t)u4Size, __FILE__, __func__);  \
-	}   \
-	if (eMemType == PHY_MEM_TYPE) { \
-		vPortFree(pvAddr); \
+	int idx; \
+	uint32_t used = 0; \
+	if (pvAddr) { \
+		taskENTER_CRITICAL(); \
+		for (idx = 0; idx < 256; idx++) { \
+			if (g_AddrAllocatedUsed[idx] == 1 && \
+				g_AddrAllocated[idx] == (uint32_t)pvAddr) { \
+				g_AddrAllocatedUsed[idx] = 0; \
+				used = g_AddrAllocatedSize[idx]; \
+				g_AddrAllocatedSize[idx] = 0; \
+				break; \
+			} \
+		} \
+		allocatedMemSize -= used; \
+		taskEXIT_CRITICAL(); \
+		DBGLOG(INIT, WARN, "<<< %p(%ld) freed in (%s)\n", \
+			pvAddr, used, __func__); \
 	} \
-	else { \
-		vPortFree(pvAddr); \
-	} \
-	LOG_FUNC("before_free(%d) rem(%d) (%s:%s)\n", \
-		usize, xPortGetFreeHeapSize(), __FILE__, __func__); \
+	SYS_FREE(pvAddr); \
+	DBGLOG(INIT, WARN, "<<< <<< before_free(%d) rem(%d) size[%d|%d]\n", \
+		usize, xPortGetFreeHeapSize(), used, allocatedMemSize); \
 }
 #else
 #define kalMemFree(pvAddr, eMemType, u4Size)  kfree(pvAddr)
@@ -725,8 +774,8 @@ static inline void kalCfg80211ScanDone(void *request,
 			ret = -1; \
 		else \
 			*resp = (uint8_t) strtoul((char *)cp, NULL, base); \
-			if ((*resp == UCHAR_MAX) && (errno == ERANGE)) \
-				ret = -1; \
+		if ((*resp == UCHAR_MAX) && (errno == ERANGE)) \
+			ret = -1; \
 	} \
 	ret; \
 })
@@ -740,8 +789,8 @@ static inline void kalCfg80211ScanDone(void *request,
 			ret = -1; \
 		else \
 			*resp = (uint16_t) strtoul((char *)cp, NULL, base); \
-			if ((*resp == USHRT_MAX) && (errno == ERANGE)) \
-				ret = -1; \
+		if ((*resp == USHRT_MAX) && (errno == ERANGE)) \
+			ret = -1; \
 	} \
 	ret; \
 })
@@ -754,8 +803,8 @@ static inline void kalCfg80211ScanDone(void *request,
 			ret = -1; \
 		else \
 			*resp = (uint32_t) strtoul((char *)cp, NULL, base); \
-			if ((*resp == UINT_MAX) && (errno == ERANGE)) \
-				ret = -1; \
+		if ((*resp == UINT_MAX) && (errno == ERANGE)) \
+			ret = -1; \
 	} \
 	ret; \
 })

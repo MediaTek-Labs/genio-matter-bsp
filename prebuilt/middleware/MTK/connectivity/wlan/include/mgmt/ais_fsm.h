@@ -105,7 +105,7 @@
 * if we need to extend this time when using SAE authentication
 */
 #define AIS_JOIN_CH_REQUEST_INTERVAL_FOR_SAE        (8000)
-#define AIS_SCN_DONE_TIMEOUT_SEC            15 /* 15 for 2.4G + 5G */	/* 5 */
+#define AIS_SCN_DONE_TIMEOUT_SEC            SCN_DONE_TIMEOUT_SEC
 #define AIS_SCN_REPORT_SEQ_NOT_SET          (0xFFFF)
 
 #define AIS_WAIT_OKC_PMKID_SEC              1000 /* unit: ms */

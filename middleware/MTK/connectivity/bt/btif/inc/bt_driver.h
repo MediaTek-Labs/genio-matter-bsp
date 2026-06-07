@@ -47,6 +47,8 @@ enum bt_driver_state_t {
 
 #define BT_OFF 0
 #define BT_ON  1
+#define DLFW_NONE 0
+#define DLFW_DONE 1
 
 typedef void (*bt_rx_data_ready_cb)(void);
 typedef void (*bt_state_change_cb)(int state);

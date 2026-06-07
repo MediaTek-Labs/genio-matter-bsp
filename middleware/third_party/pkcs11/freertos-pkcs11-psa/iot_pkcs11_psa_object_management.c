@@ -31,6 +31,8 @@
  * @brief Functions of managing the objects stored in TF-M.
  */
 
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #include <string.h>
 #include "iot_pkcs11_psa_object_management.h"
 #include "iot_pkcs11_psa_input_format.h"

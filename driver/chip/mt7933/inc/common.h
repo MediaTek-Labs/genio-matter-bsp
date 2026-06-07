@@ -39,6 +39,7 @@
 #include "typedefs.h"
 #include "driver_api.h"
 #include <stdio.h>
+#include <stdint.h>
 
 #ifndef MSG
 #define MSG dbg_print

@@ -54,6 +54,8 @@
 
 #if (CFG_SUPPORT_802_11AX == 1)
 
+/* BSS Color Change Announcement */
+#define ELEM_EXT_ID_BSS_COLOR_CHANGE     42
 #define ELEM_EXT_CAP_TWT_REQUESTER_SUPP_BIT       77
 #define ELEM_EXT_CAP_TWT_RESPONDER_SUPP_BIT       78
 
@@ -296,8 +298,11 @@
 #define HE_OP_PARAM2_ER_SU_DISABLE_SHFT                 0
 
 /* HE Operation element - BSS Color Information */
+#define HE_OP_BSSCOLOR_BSS_COLOR_MASK                   BITS(0, 5)
 #define HE_OP_BSSCOLOR_BSS_COLOR_SHFT                   0
+#define HE_OP_BSSCOLOR_PARTIAL_BSS_COLOR                BIT(6)
 #define HE_OP_BSSCOLOR_PARTIAL_BSS_COLOR_SHFT           6
+#define HE_OP_BSSCOLOR_BSS_COLOR_DISABLE                BIT(7)
 #define HE_OP_BSSCOLOR_BSS_COLOR_DISABLE_SHFT           7
 
 /* Spatial Reuse Parameter Set element - SR Control field */
@@ -736,6 +741,14 @@ struct _IE_HE_OP_T {
 	u_int8_t  ucBssColorInfo;
 	u_int16_t u2HeBasicMcsSet;
 	u_int8_t  aucVarInfo[0];
+} __KAL_ATTRIB_PACKED__;
+
+struct _IE_COLOR_CHANGE_ANNOUNCEMENT_T {
+	u_int8_t  ucId;
+	u_int8_t  ucLength;
+	u_int8_t  ucExtId;
+	u_int8_t  ucColorSwitchCntdn;
+	u_int8_t  ucNewBssColorInfo;
 } __KAL_ATTRIB_PACKED__;
 
 struct _HE_SUPPORTED_MCS_FIELD {

@@ -262,7 +262,25 @@ hal_flash_status_t hal_flash_otp_lockstatus(uint8_t *lockstatus);
  */
 hal_flash_status_t Flash_ReturnReady(void);
 
+/**
+ * @brief  check device ready, if flash is suspended, need to do resume
+ */
+int sf_CheckDeviceReady(void);
 
+/**
+ * @brief  check device is suspended or not
+ */
+bool sf_is_suspend(void);
+
+/**
+ * @brief  send flash suspend command
+ */
+int sf_send_suspend(void);
+
+/**
+ * @brief  send flsah resume command
+ */
+int sf_send_resume(void);
 
 #ifdef __cplusplus
 }

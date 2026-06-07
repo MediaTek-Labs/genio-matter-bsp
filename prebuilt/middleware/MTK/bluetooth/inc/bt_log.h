@@ -1573,6 +1573,12 @@ extern const char BTGAP_433[];
 extern const char BTGAP_434[];
 /*  "[GAP] set privacy mode = %04x ,peer identity address = %12x ,address type = %04x" */
 extern const char BTGAP_435[];
+/*  "[GAP] bt_gap_le_set_adv_public_address" */
+extern const char BTGAP_442[];
+/*  "[GAP] bt_gap_le_set_adv_public_address_proc: timer_id(0x%08x)" */
+extern const char BTGAP_443[];
+/*  "[GAP] set public address timer 0x%08x expired" */
+extern const char BTGAP_444[];
 
 
 /*  "[GATT] is gatt over edr: %d"  */
@@ -3186,6 +3192,23 @@ extern const char BTSM_156[];
 extern const char BTSM_157[];
 /*  "[SM] wl role error = %02x"  */
 extern const char BTSM_158[];
+/*  "[SM] smp proc connection is NULL"  */
+extern const char BTSM_159[];
+/*  "[SM] bredr pairing is ongoing handle = %02x"  */
+extern const char BTSM_160[];
+/*  "[SM] send with type out of memory"  */
+extern const char BTSM_161[];
+/*  "[SM] get ltk form link key fail"  */
+extern const char BTSM_162[];
+/*  "[SM] get ltk form link pairing exchange fail"  */
+extern const char BTSM_163[];
+/*  "[SM] bredr sm key distribution fail"  */
+extern const char BTSM_164[];
+/*  "[SM] key distribute = %02x, next_distribute = %02x"  */
+extern const char BTSM_165[];
+/*  "[SM] receive bredr sm code = %02x"  */
+extern const char BTSM_166[];
+
 
 /*  "[A2DP] Alloc memory, basic info. size_sig:%d, size_med:%d, size_link_node:%d, size_node:%d"  */
 extern const char BTA2DP_001[];
@@ -4658,7 +4681,7 @@ extern const char BTULL_010[];
 extern const char BTULL_011[];
 /*  "[ULL] bt_ull_le_unmute_air_cis, not find air cis info, handle: 0x%x" */
 extern const char BTULL_012[];
-/*  "[ULL] bt_ull_le_activiate_uplink, not find air cis info, handle: 0x%x" */
+/*  "[ULL] bt_ull_le_activate_uplink, not find air cis info, handle: 0x%x" */
 extern const char BTULL_013[];
 /*  "[ULL] bt_ull_le_set_air_params_table, out of memory" */
 extern const char BTULL_014[];

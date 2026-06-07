@@ -35,10 +35,8 @@
 #ifndef __MQTT_MEDIATEK__
 #define __MQTT_MEDIATEK__
 
-#include "mbedtls/compat-1.3.h"
 #include "mbedtls/net.h"
 #include "mbedtls/ssl.h"
-#include "mbedtls/certs.h"
 
 #include "syslog.h"
 

@@ -233,12 +233,24 @@ u_int8_t twtGetTxTeardownFlowId(
 uint8_t twtGetTxInfoFlowId(
 	struct MSDU_INFO *prMsduInfo);
 
+#if (CFG_SUPPORT_TWT_SUSPEND_RESUME == 1)
 static inline u_int8_t twtGetNextTWTByteCnt(u_int8_t ucNextTWTSize)
 {
 	return (ucNextTWTSize == NEXT_TWT_SUBFIELD_64_BITS) ? 8 :
 		((ucNextTWTSize == NEXT_TWT_SUBFIELD_32_BITS) ? 4 :
 		((ucNextTWTSize == NEXT_TWT_SUBFIELD_48_BITS) ? 6 : 0));
 }
+#endif
+
+void twtBackupTwtParam(
+	IN uint8_t u1BssIdx,
+	IN uint8_t u1TWTFlowId,
+	IN uint8_t ucSetupCmd,
+	IN struct _TWT_PARAMS_T *prTWTParams
+	);
+void twtSuspendTwtInternal(IN struct ADAPTER *prAdapter);
+void twtResumeTwtInternal(IN struct ADAPTER *prAdapter);
+
 /*******************************************************************************
 *                              F U N C T I O N S
 ********************************************************************************

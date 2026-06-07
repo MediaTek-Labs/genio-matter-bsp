@@ -85,6 +85,7 @@
 #define CPUM_BASE                    0x34050000
 #define GCPU_SEC_BASE                0x34401000
 #define GCPU_NON_SEC_BASE            0x34402000
+#define SNFC_BASE                    0x34403000
 #define TRNG_BASE                    0x34404000
 #define INFRA_BCRM_OFF_BASE          0x34405000
 #define INFRA_DEVAPC_BASE            0x34406000

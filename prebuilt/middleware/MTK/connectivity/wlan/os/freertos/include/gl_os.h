@@ -286,7 +286,11 @@ void _complete(struct completion *comp, const char *name);
 #else
 #define WLAN_INIT_STACK_SIZE (configMINIMAL_STACK_SIZE + 10) /* unit in word */
 #endif
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+#define WLAN_THREAD_STACK_SIZE		(1024*4)	/* unit in word */
+#else
 #define WLAN_THREAD_STACK_SIZE		(800)	/* unit in word */
+#endif
 #define WLAN_WAIT_LOCK_TIME			(5000/portTICK_PERIOD_MS)
 /* if not get semaphor, get into suspend right away */
 #define WLAN_TIMER_EXPIRE_REQ		(2000)
@@ -765,6 +769,9 @@ struct GLUE_INFO {
 #if (CONFIG_WLAN_SERVICE == 1)
 	struct service rService;
 #endif
+	/* for deauth with PMF enabled */
+	struct completion rDeauthComp;
+	u_int8_t encryptedDeauthIsInProcess;
 };
 extern struct GLUE_INFO *g_prGlueInfo;
 extern struct ADAPTER *g_prAdpater;

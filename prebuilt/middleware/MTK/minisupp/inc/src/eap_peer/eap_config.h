@@ -293,6 +293,21 @@ struct eap_peer_cert_config {
 	 * 2 = require valid OCSP stapling response
 	 */
 	int ocsp;
+
+    /**
+     * MTK FreeRTOS CA
+     * set ca_cert, client_cert and client_key with array directly
+     * instead of using blob to reduce code size
+     */
+    uint8_t *mtk_ca_cert;
+    size_t mtk_ca_cert_len;
+
+    uint8_t *mtk_client_cert;
+    size_t mtk_client_cert_len;
+
+    uint8_t *mtk_client_key;
+    size_t mtk_client_key_len;
+
 };
 
 /**
@@ -704,6 +719,13 @@ struct eap_peer_config {
 	} pending_ext_cert_check;
 
 	int teap_anon_dh;
+
+    /**
+     * MTK_EAP_Type
+     * encapsulate EAP_TYPE_* and inner auth for MTK scenarios
+     */
+    uint8_t mtk_eap_type;
+
 };
 
 

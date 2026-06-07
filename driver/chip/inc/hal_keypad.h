@@ -111,9 +111,6 @@
  *    @code
  *      hal_keypad_config_t keypad_config;
  *
- *      keypad_config.mode  = HAL_KEYPAD_MODE_DOUBLE_KEY;                   // Chooses double key.
- *      keypad_config.key_map.column_bitmap = 0x07;                         // Columns 0 to 2 are selected.
- *      keypad_config.key_map.row_bitmap    = 0x07;                         // Rows 0 to 2 are selected.
  *      keypad_config.debounce              = 16;                           // Sets the debounce time to 16 milliseconds.
  *
  *      if (HAL_KEYPAD_STATUS_OK != hal_keypad_init(&keypad_config)) {  // initialize the keypad module.

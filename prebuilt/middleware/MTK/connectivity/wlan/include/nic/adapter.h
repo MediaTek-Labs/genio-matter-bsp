@@ -582,6 +582,10 @@ struct BSS_INFO {
 	uint8_t  ucHeOpParams[HE_OP_BYTE_NUM];
 	uint8_t  ucBssColorInfo;
 	uint16_t u2HeBasicMcsSet;
+	uint8_t ucColorAnnouncement; /* Record if receive announcement */
+	uint8_t ucColorSwitchCntdn;
+	uint8_t ucNewBssColorInfo;
+	uint64_t u64ExpectedTimestamp; /* the time to change bss color */
 #endif
 
 #if (CFG_SUPPORT_802_11V_MBSSID == 1)
@@ -1222,6 +1226,17 @@ struct WIFI_VAR {
 	uint8_t ucDisable11K;
 	uint8_t ucDisable11V;
 #endif
+
+#if CFG_SUPPORT_ANT_DIV
+	uint8_t ucAntDivMode;
+#endif
+
+#if CFG_SUPPORT_SCAN_CH_TIME
+	uint8_t uChannelDwellTime;
+#endif
+
+	uint8_t ucPassiveToActiveScan;
+	uint8_t ucPassiveToActiveScanShorterDFS;
 };
 
 /* cnm_timer module */
@@ -1482,6 +1497,14 @@ struct ADAPTER {
 	uint32_t u4CSUMFlags;
 #endif				/* CFG_TCP_IP_CHKSUM_OFFLOAD */
 	enum ENUM_BAND aePreferBand[NETWORK_TYPE_NUM];
+
+#if CFG_SUPPORT_TSF_SYNC
+	/* Wi-Fi timestamp sync function*/
+	uint64_t uTSFCount;
+	uint64_t uGPT1MCount;
+	uint32_t uOsTick;
+	uint64_t uGPTOverflowCount;
+#endif
 
 	/* ADAPTER flags */
 	uint32_t u4Flags;

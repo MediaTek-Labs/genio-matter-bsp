@@ -32,7 +32,6 @@
 #include "hal_md5.h"
 #include "hal_gpt.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -141,6 +140,7 @@ int mbedtls_md5_finish_ret( mbedtls_md5_context *ctx,
 int mbedtls_internal_md5_process( mbedtls_md5_context *ctx,
                                   const unsigned char data[64] );
 
+#if 0
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
 #if defined(MBEDTLS_DEPRECATED_WARNING)
 #define MBEDTLS_DEPRECATED      __attribute__((deprecated))
@@ -159,7 +159,7 @@ int mbedtls_internal_md5_process( mbedtls_md5_context *ctx,
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_md5_starts( mbedtls_md5_context *ctx );
+MBEDTLS_DEPRECATED int mbedtls_md5_starts( mbedtls_md5_context *ctx );
 
 /**
  * \brief          MD5 process buffer
@@ -175,7 +175,7 @@ MBEDTLS_DEPRECATED void mbedtls_md5_starts( mbedtls_md5_context *ctx );
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_md5_update( mbedtls_md5_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_md5_update( mbedtls_md5_context *ctx,
                                             const unsigned char *input,
                                             size_t ilen );
 
@@ -192,7 +192,7 @@ MBEDTLS_DEPRECATED void mbedtls_md5_update( mbedtls_md5_context *ctx,
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_md5_finish( mbedtls_md5_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_md5_finish( mbedtls_md5_context *ctx,
                                             unsigned char output[16] );
 
 /**
@@ -211,9 +211,9 @@ MBEDTLS_DEPRECATED void mbedtls_md5_finish( mbedtls_md5_context *ctx,
 MBEDTLS_DEPRECATED void mbedtls_md5_process( mbedtls_md5_context *ctx,
                                              const unsigned char data[64] );
 
-#undef MBEDTLS_DEPRECATED
+//#undef MBEDTLS_DEPRECATED
 #endif /* !MBEDTLS_DEPRECATED_REMOVED */
-
+#endif
 #ifdef __cplusplus
 }
 #endif

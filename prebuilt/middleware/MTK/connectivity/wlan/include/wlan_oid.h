@@ -432,6 +432,19 @@ struct cfg80211_external_auth_params {
 
 #endif
 
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+struct remain_on_channel_info {
+	/**
+	 * freq - Channel frequency in MHz
+	 */
+	unsigned int freq;
+	/**
+	 * duration - Duration to remain on the channel in milliseconds
+	 */
+	unsigned int duration;
+};
+
+#endif
 struct PARAM_OP_MODE {
 	enum ENUM_PARAM_OP_MODE eOpMode;
 	uint8_t ucBssIdx;
@@ -4533,5 +4546,13 @@ wlanoidAisPreSuspend(IN struct ADAPTER *prAdapter,
 		IN void *pvSetBuffer,
 		IN uint32_t u4SetBufferLen,
 		OUT uint32_t *pu4SetInfoLen);
+
+
+#if (CFG_SUPPORT_TSF_SYNC == 1)
+uint32_t
+wlanoidLatchTSF(IN struct ADAPTER *prAdapter,
+		    IN void *pvQueryBuffer, IN uint32_t u4QueryBufferLen,
+		    OUT uint32_t *pu4QueryInfoLen);
+#endif
 
 #endif /* _WLAN_OID_H */

@@ -41,17 +41,20 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* #ifdef __cplusplus */
 
 
 extern cmd_t thermal_cli_cmds[];
+#if defined(HAL_TOP_THERMAL_MODULE_ENABLED)
 #define THERMAL_CLI_ENTRY      {"thermal", "thermal test", NULL, thermal_cli_cmds},
-
+#else /* #if defined(HAL_TOP_THERMAL_MODULE_ENABLED) */
+#define THERMAL_CLI_ENTRY
+#endif /* #if defined(HAL_TOP_THERMAL_MODULE_ENABLED) */
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* #ifdef __cplusplus */
 
 
-#endif /* __GPIO_CLI_H__ */
+#endif /* #ifndef __THERMAL_CLI_H__ */
 

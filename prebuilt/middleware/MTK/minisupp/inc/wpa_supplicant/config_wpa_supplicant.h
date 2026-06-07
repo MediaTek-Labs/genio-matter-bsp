@@ -1723,6 +1723,14 @@ struct wpa_config * wpa_config_alloc_empty(const char *ctrl_interface,
 					   const char *driver_param);
 struct wpa_config * wpa_config_alloc_new_conf(struct wpa_ssid *old_ssid);
 
+
+/* Prototypes for wpa-enterprise api */
+void wpa_config_set_load_cert(struct wpa_ssid *ssid, uint8_t cert_type, uint32_t start_addr, uint32_t length);
+void wpa_config_set_eap_user_id(struct wpa_ssid *ssid, uint8_t *user_id_str, uint32_t user_id_len);
+void wpa_config_set_eap_user_pwd(struct wpa_ssid *ssid, uint8_t *pwd_str, uint32_t pwd_len);
+void wpa_config_set_eap_type(struct wpa_ssid *ssid, uint8_t eap_type);
+
+
 #ifndef CONFIG_NO_STDOUT_DEBUG
 void wpa_config_debug_dump_networks(struct wpa_config *config);
 #else /* CONFIG_NO_STDOUT_DEBUG */

@@ -464,7 +464,7 @@ enum key_flag {
 
 static inline int check_key_flag(enum key_flag key_flag)
 {
-	return !!(!key_flag ||
+	return !!(!((bool) key_flag) ||
 		  ((key_flag & (KEY_FLAG_PAIRWISE | KEY_FLAG_MODIFY)) &&
 		   (key_flag & ~KEY_FLAG_PAIRWISE_MASK)) ||
 		  ((key_flag & KEY_FLAG_GROUP) &&

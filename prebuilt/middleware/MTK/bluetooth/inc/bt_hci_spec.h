@@ -431,6 +431,8 @@ typedef uint8_t bt_uart_t;
 #define BT_HCI_CMD_VENDOR_LOWPOWER_SET_SYNCDROP              0xFC10
 #define BT_HCI_CMD_VENDOR_SET_EARBUDS_PLUS_MODE              0xFC86
 
+#define BT_HCI_CMD_VENDOR_LE_SET_ADV_PUBLIC_ADDRESS          0xFC8B
+
 /* Google. */
 #define BT_HCI_CMD_VENDOR_CAPABILITY                         0xFD53
 #define BT_HCI_CMD_MULTIPLE_ADVERTISING                      0xFD54
@@ -439,6 +441,15 @@ typedef uint8_t bt_uart_t;
 #define BT_HCI_CMD_LE_SET_MULTI_SCAN_RESP_DATA               0x03
 #define BT_HCI_CMD_LE_SET_MULTI_ADV_RANDOM_ADDR              0x04
 #define BT_HCI_CMD_LE_SET_MULTI_ADV_ENABLE                   0x05
+#define BT_HCI_CMD_ADVERTISEMENT_PACKET_CONTENT_FILTER       0xFD57
+#define BT_HCI_CMD_LE_APCF_ENABLE                            0x00
+#define BT_HCI_CMD_LE_APCF_SET_FILTERING_PARAMETERS          0x01
+#define BT_HCI_CMD_LE_APCF_BROADCAST_ADDRESS                 0x02
+#define BT_HCI_CMD_LE_APCF_SERVICE_UUID                      0x03
+#define BT_HCI_CMD_LE_APCF_SERVICE_SOLICITATION_UUID         0x04
+#define BT_HCI_CMD_LE_APCF_LOCAL_NAME                        0x05
+#define BT_HCI_CMD_LE_APCF_MANUFACTURER_DATA                 0x06
+#define BT_HCI_CMD_LE_APCF_SERVICE_DATA                      0x07
 
 /* aws oh */
 #define BT_HCI_CMD_VENDOR_SET_AWS_AUD_ENHANCE_MODE           0xFDB2 /* AWS Enhancement */
@@ -484,7 +495,7 @@ typedef uint8_t bt_uart_t;
 #define BT_HCI_CMD_VENDOR_CHANGE_AIR_PARAMS                  0xFE08
 #define BT_HCI_CMD_VENDOR_ACTIVIATE_UPLINK                   0xFE09
 #define BT_HCI_CMD_VENDOR_UNMUTE_AIR_CIS                     0xFE0A
-#define BT_HCI_CMD_VENDOR_SET_AIR_PARAMS_TABLE               0xFE0B
+#define BT_HCI_CMD_VENDOR_SET_AIR_CIG_PARAMS_TABLE           0xFE0B
 
 typedef uint16_t bt_hci_cmd_op_t;
 
@@ -595,7 +606,7 @@ typedef uint16_t bt_hci_cmd_op_t;
 #define BT_HCI_EVT_VENDOR_AGNET_MODE_CHANGED                0xF8
 #define BT_HCI_EVT_VENDOR_EDR_ENABLE_EVENT                  0x02
 #define BT_HCI_EVT_VENDOR_AWS_READY_EVENT                   0x03
-
+#define BT_HCI_EVT_VENDOR_SECURE_CONNECTION_SUPPORT_REPORT  0x05
 typedef uint8_t bt_hci_evt_op_t;
 
 /**
@@ -903,6 +914,29 @@ typedef struct {
 }) bt_hci_cmd_le_set_multi_advertising_enable_t;
 
 /**
+ *  @brief      LE Advertisement Packet Content Filter(APCF) command complete event.
+ */
+BT_PACKED (
+typedef struct {
+    bt_hci_status_t   status;
+    uint8_t           apcf_opcode;
+    uint8_t           action;
+    uint8_t           available_spaces;
+    uint8_t           client_if;                /**< internal use */
+}) bt_hci_evt_cc_le_set_apcf_t;
+
+/**
+ *  @brief      LE Advertisement Packet Content Filter(APCF) command complete event.
+ */
+BT_PACKED (
+typedef struct {
+    bt_hci_status_t   status;
+    uint8_t           apcf_opcode;
+    uint8_t           enable;
+    uint8_t           client_if;                /**< internal use */
+}) bt_hci_evt_cc_le_enable_apcf_t;
+
+/**
  *  @brief      LE read phy command.
  */
 BT_PACKED(
@@ -1065,6 +1099,7 @@ BT_PACKED(
 typedef struct {
     bt_bd_addr_t      public_address; /**< Public address */
 }) bt_hci_cmd_set_bd_addr_t;
+
 
 /**
  * @brief Below command complete events only have status parameter, so define a general structure for common use.

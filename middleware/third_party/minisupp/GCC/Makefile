@@ -75,6 +75,10 @@ include module.mk
 # Project name
 ifeq ($(MTK_WIFI_AP_ENABLE),n)
 WPSNAME=_sta
+else
+ifeq ($(MTK_MT7933_P2P_SUPPORT), y)
+WPSNAME = _ap_sta_p2p
+endif
 endif
 
 # Project name
@@ -92,10 +96,27 @@ ifeq ($(MTK_DEBUG_LEVEL),none)
 CFLAGS += -DCONFIG_NO_STDOUT_DEBUG
 endif
 
-TARGET_LIB=libminisupp${WPSNAME}${LTO_LIB_POST_NAME}${WLANMODE}
+ifeq ($(MTK_IEEE8021X_ENABLE),y)
+WLANENTERPRISE=_enterprise
+else
+WLANENTERPRISE=
+endif
+
+# add TFM files
+ifeq ($(MTK_TFM_ENABLE),y)
+CFLAGS  += -DMTK_TFM_ENABLE=1
+CFLAGS += -I$(SOURCE_DIR)/middleware/third_party/tfm/trusted-firmware-m/interface/include
+endif
+
+TARGET_LIB=libminisupp${WPSNAME}${LTO_LIB_POST_NAME}${WLANMODE}${WLANENTERPRISE}
 BUILD_DIR = $(PWD)/Build
 OUTPATH = $(PWD)/Build
 
+
+ifeq ($(MTK_IEEE8021X_ENABLE),y)
+$(info ENABLE IEEE8021X)
+CFLAGS += -DHAL_FLASH_MODULE_ENABLED
+endif
 
 export CFLAGS
 export INCLUDE
@@ -123,7 +144,7 @@ gen_lib: $(C_OBJS) $(S_OBJS) wpa_supplicant
 
 wpa_supplicant:
 	@mkdir -p $(BUILD_DIR)
-	$(MAKE) -C $(DIR)/wpa_supplicant NAME=minisupp$(WPSNAME)${LTO_LIB_POST_NAME}${WLANMODE} PROJ_PATH=$(PROJ_PATH) BUILD_DIR=$(BUILD_DIR)
+	$(MAKE) -C $(DIR)/wpa_supplicant NAME=minisupp$(WPSNAME)${LTO_LIB_POST_NAME}${WLANMODE}${WLANENTERPRISE} PROJ_PATH=$(PROJ_PATH) BUILD_DIR=$(BUILD_DIR) MTK_IEEE8021X_ENABLE=$(MTK_IEEE8021X_ENABLE)
 
 hostapd:
 	@mkdir -p $(BUILD_DIR)
@@ -156,7 +177,7 @@ prebuilt_install:
 	mkdir -p $(SOURCE_DIR)/prebuilt/middleware/MTK/minisupp/lib
 	mkdir -p $(SOURCE_DIR)/prebuilt/middleware/MTK/minisupp/inc
 	
-	$(STRIP) -d $(BUILD_DIR)/$(TARGET_LIB).a
+	$(STRIP) -d --keep-section=.gnu.debuglto_* $(BUILD_DIR)/$(TARGET_LIB).a
 	cp $(BUILD_DIR)/$(TARGET_LIB).a $(SOURCE_DIR)/prebuilt/middleware/MTK/minisupp/lib
 	cd ${DIR};\
 	find . -name "*.h" -exec bash -c 'cp -p --parents {} $(SOURCE_DIR)/prebuilt/middleware/MTK/minisupp/inc/ ' \;

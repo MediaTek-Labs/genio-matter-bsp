@@ -856,6 +856,8 @@ struct ENHANCE_MODE_DATA_STRUCT {
 #define FEAT_SUP_LLC_VLAN_RX(__chip_info) \
 	((__chip_info)->features & FEAT_BITS_LLC_VLAN_RX)
 
+#define IS_WF_SW_IRQ_ASSERT                    (1)
+#define IS_WF_SW_IRQ_RESERVED                  (0)
 /*******************************************************************************
  *                             D A T A   T Y P E S
  *******************************************************************************
@@ -1412,7 +1414,7 @@ struct mt66xx_chip_info {
 	int (*checkbushang)(void *prAdapter,
 		uint8_t ucWfResetEnable);
 	int (*trigger_wholechiprst)(char *reason);
-	void (*sw_interrupt_handler)(IN struct ADAPTER *prAdapter);
+	int (*sw_interrupt_handler)(IN struct ADAPTER *prAdapter);
 #if CFG_CHIP_RESET_SUPPORT
 	u_int8_t (*asicWfsysRst)(struct ADAPTER *prAdapter,
 				 u_int8_t fgAssertRst);

@@ -68,6 +68,8 @@
  *******************************************************************************
  */
 
+extern wifi_rx_handler_t connsys_wow_handler[WIFI_WOW_TYPE_NUM];
+
 /*******************************************************************************
  *                              C O N S T A N T S
  *******************************************************************************
@@ -1501,5 +1503,10 @@ int32_t nicRxGetLastRxRssi(struct ADAPTER *prAdapter, IN char *pcCommand,
 void
 nicEventCSIData(IN struct ADAPTER *prAdapter, IN struct WIFI_EVENT *prEvent);
 #endif
+
+int nic_rx_set_wow_handler(wifi_rx_handler_t prHandler, uint8_t u1Type);
+
+int nic_rx_wow_handler(uint8_t u1Type,
+	uint8_t *prEtherFrame, uint32_t u4Len);
 
 #endif /* _NIC_RX_H */

@@ -847,24 +847,6 @@ typedef enum {
     HAL_SPI_SLAVE_EVENT_DMA_DONE        = 9     /**< All tx or rx data transfer done. */
 } hal_spi_slave_callback_event_t;
 
-/** @brief This enum defines the SPI slave commands.
- *MT7933 not support, just for build pass.
- */
-typedef enum {
-    HAL_SPI_SLAVE_CMD_WS        = 0,       /**< Write Status command. */
-    HAL_SPI_SLAVE_CMD_RS        = 1,       /**< Read Status command. */
-    HAL_SPI_SLAVE_CMD_WR        = 2,       /**< Write Data command. */
-    HAL_SPI_SLAVE_CMD_RD        = 3,       /**< Read Data command. */
-    HAL_SPI_SLAVE_CMD_POWEROFF  = 4,       /**< POWER OFF command. */
-    HAL_SPI_SLAVE_CMD_POWERON   = 5,       /**< POWER ON command. */
-    HAL_SPI_SLAVE_CMD_CW        = 6,       /**< Configure Write command. */
-    HAL_SPI_SLAVE_CMD_CR        = 7,        /**< Configure Read command. */
-    HAL_SPI_SLAVE_CMD_CT        = 8        /**< Configure Type command. */
-} hal_spi_slave_command_type_t;
-/**
- * @}
- */
-
 
 /**
  * @}

@@ -23,6 +23,8 @@
  * http://www.FreeRTOS.org
  */
 
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 /* Standard includes. */
 #include <stdlib.h>
 #include <string.h>
@@ -43,11 +45,11 @@
 /* mbedTLS includes. */
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
-#include "mbedtls/pk_internal.h"
+//#include "mbedtls/pk_internal.h"
 #include "mbedtls/oid.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
-#include "mbedtls/entropy_poll.h"
+//#include "mbedtls/entropy_poll.h"
 #include "mbedtls/x509_crt.h"
 
 /* Length parameters for importing RSA-2048 private keys. */
@@ -80,6 +82,8 @@ typedef struct RsaParams_t
     CK_BYTE exponent2[ EXPONENT_2_LENGTH + 1 ];
     CK_BYTE coefficient[ COEFFICIENT_LENGTH + 1 ];
 } RsaParams_t;
+
+extern const mbedtls_pk_info_t mbedtls_eckey_info;
 
 /* PKCS #11 Globals.
  * These are used to reduce setup and tear down calls, and to
@@ -829,10 +833,9 @@ void test_Sign_RSA( void )
         mbedTLSResult = mbedtls_pk_parse_key( ( mbedtls_pk_context * ) &mbedPkContext,
                                               ( const unsigned char * ) validRSAPrivateKey,
                                               sizeof( validRSAPrivateKey ),
-                                              NULL,
-                                              0 );
+                                              NULL, 0, NULL, NULL );
 
-        mbedTLSResult = mbedtls_rsa_pkcs1_verify( mbedPkContext.pk_ctx, NULL, NULL, MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_SHA256, 32, hashedMessage, signature );
+        mbedTLSResult = mbedtls_rsa_pkcs1_verify( mbedPkContext.pk_ctx, MBEDTLS_MD_SHA256, 32, hashedMessage, signature );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedTLSResult, "mbedTLS failed to parse valid RSA key (verification)" );
     }
 
@@ -1133,8 +1136,7 @@ void test_Verify_EC( void )
         mbedResult = mbedtls_pk_parse_key( &pkCtx,
                                            ( const unsigned char * ) validECDSAPrivateKey,
                                            sizeof( validECDSAPrivateKey ),
-                                           NULL,
-                                           0 );
+                                           NULL, 0, NULL, NULL );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to parse valid ECDSA key." );
         /* Initialize the RNG. */
         mbedtls_entropy_init( &entropyCtx );
@@ -1142,7 +1144,7 @@ void test_Verify_EC( void )
         mbedResult = mbedtls_ctr_drbg_seed( &drbgCtx, mbedtls_entropy_func, &entropyCtx, NULL, 0 );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to initialize DRBG" );
 
-        mbedResult = mbedtls_pk_sign( &pkCtx, MBEDTLS_MD_SHA256, hashedMessage, sizeof( hashedMessage ), signature, &signatureLength, mbedtls_ctr_drbg_random, &drbgCtx );
+        mbedResult = mbedtls_pk_sign( &pkCtx, MBEDTLS_MD_SHA256, hashedMessage, sizeof( hashedMessage ), signature, sizeof(signature), &signatureLength, mbedtls_ctr_drbg_random, &drbgCtx );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to perform ECDSA signature." );
 
         mbedtls_pk_free( &pkCtx );
@@ -1654,7 +1656,7 @@ static CK_RV provisionPrivateKey( CK_SESSION_HANDLE session,
     mbedtls_pk_context mbedPkContext = { 0 };
 
     mbedtls_pk_init( &mbedPkContext );
-    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, privateKey, privateKeyLength, NULL, 0 );
+    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, privateKey, privateKeyLength, NULL, 0, NULL, NULL );
 
     if( mbedResult != 0 )
     {
@@ -1715,8 +1717,7 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
     mbedtls_pk_init( &mbedPkContext );
 
     /* Try parsing the private key using mbedtls_pk_parse_key. */
-    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, keyPtr, keyLength, NULL, 0 );
-
+    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, keyPtr, keyLength, NULL, 0, NULL, NULL );
     /* If mbedtls_pk_parse_key didn't work, maybe the private key is not included in the input passed in.
      * Try to parse just the public key. */
     if( mbedResult != 0 )

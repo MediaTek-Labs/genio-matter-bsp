@@ -3,6 +3,14 @@
 #
 import("//build_overrides/mt793x_sdk.gni")
 
+#
+# Determine the PACKAGE TYPE "QFN" and "BGA" and HAL Library for filogic SDK.
+#
+declare_args() {
+  MTK_PACKAGE_TYPE = "BGA"
+  HAL_Lib = true
+}
+
 mt793x_sdk_include_dirs = [
   "${mt793x_sdk_build_root}/filogic/kernel/rtos/FreeRTOS/SourceV10/include",
   "${mt793x_sdk_build_root}/filogic/kernel/rtos/FreeRTOS/SourceV10/portable/GCC/ARM_CM33_NTZ/non_secure",
@@ -20,6 +28,7 @@ mt793x_sdk_include_dirs = [
   "${mt793x_sdk_build_root}/filogic/middleware/MTK/dhcpd/inc",
 
   "${mt793x_sdk_build_root}/filogic/middleware/third_party/mbedtls/include",
+  "${mt793x_sdk_build_root}/filogic/middleware/third_party/micro_ecc",
 
   "${mt793x_sdk_build_root}/filogic/prebuilt/middleware/MTK/connectivity/wlan/os",
   "${mt793x_sdk_build_root}/filogic/prebuilt/middleware/MTK/connectivity/wlan/os/freertos/include",
@@ -68,7 +77,7 @@ mt793x_sdk_defines = [
   "HEAP_SIZE=0xF000",
   "gLoggingActive_d=0",
   "gLogRingPlacementOffset_c=0xF000",
-  "MBEDTLS_CONFIG_FILE=\"mt793x-mbedtls-config.h\"",
+  "MBEDTLS_CONFIG_FILE=\"config-mtk-matter.h\"",
   "MTK_MINICLI_ENABLE",
   "MTK_MDNS_ENABLE",
   "MTK_FOTA_V3_ENABLE",
@@ -178,6 +187,7 @@ mt793x_sdk_defines += [
   "CFG_ENABLE_GTK_FRAME_FILTER=0",
   "CFG_MET_PACKET_TRACE_SUPPORT=0",
   "CFG_MET_TAG_SUPPORT=0",
+  "MTK_SCAN_LIST_SIZE=32",
 
   "LWIP_DEBUG=1",
 
@@ -219,7 +229,6 @@ mt793x_sdk_defines += [
   "HAL_MPU_MODULE_ENABLED",
   "HAL_NVIC_MODULE_ENABLED",
   "HAL_PSRAM_MODULE_ENABLED",
-  "HAL_PSRAM_NON_UHS_ENABLED",
   "HAL_SLEEP_MANAGER_ENABLED",
   "HAL_SPI_MASTER_MODULE_ENABLED",
   "HAL_TRNG_MODULE_ENABLED",
@@ -231,6 +240,17 @@ mt793x_sdk_defines += [
   # others
   "MTK_NVDM_ENABLE",
 ]
+
+if (MTK_PACKAGE_TYPE == "QFN") {
+  mt793x_sdk_defines += [
+    "HAL_PSRAM_NON_UHS_ENABLED",
+  ]
+}
+else if (MTK_PACKAGE_TYPE == "BGA") {
+  mt793x_sdk_defines += [
+    "HAL_PSRAM_UHS_ENABLED",
+  ]
+}
 
 mt793x_sdk_cflags = [
   "-Wno-error=absolute-value",
@@ -253,4 +273,6 @@ mt793x_sdk_cflags += [
   "-Wno-format-nonliteral",
   "-Wno-error=shadow",
   "-Wno-error=type-limits",
+  "-Wno-error=int-conversion",
+  "-Wno-error=implicit-int",
 ]

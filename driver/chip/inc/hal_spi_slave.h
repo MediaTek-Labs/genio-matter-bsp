@@ -324,12 +324,6 @@ extern "C" {
   */
 #ifdef HAL_SPI_SLAVE_FEATURE_SW_CONTROL
 
-/** @brief The SPI slave sends MISO data half SCLK cycle early. */
-typedef enum {
-    HAL_SPI_SLAVE_EARLY_MISO_DISABLE = 0,            /**< Disables send MISO data half SCLK cycle early. */
-    HAL_SPI_SLAVE_EARLY_MISO_ENABLE  = 1             /**< Enables send MISO data half SCLK cycle early. */
-} hal_spi_slave_early_miso_t;
-
 
 /** @brief SPI slave running status. */
 typedef enum {
@@ -498,21 +492,6 @@ hal_spi_slave_status_t hal_spi_slave_register_callback(hal_spi_slave_port_t spi_
 hal_spi_slave_status_t hal_spi_slave_send_and_receive(hal_spi_slave_port_t spi_port, const uint8_t *tx_buf, uint8_t *rx_buf, uint32_t size);
 
 
-/**
- * @brief     This function sends data asynchronously with DMA mode, this function should be called from user's callback function.
- * @param[in] spi_port is the SPI slave port number, the value is defined at #hal_spi_slave_port_t.
- * @param[in] data is the buffer of data to be sent, this parameter cannot be NULL, also the address must be as non-cacheable address.
- * @param[in] size is the number of bytes to send.
- * @return    #HAL_SPI_SLAVE_STATUS_ERROR_PORT, if the SPI slave port is invalid. \n
- *            #HAL_SPI_SLAVE_STATUS_INVALID_PARAMETER, if an invalid parameter is given by user. \n
- *            #HAL_SPI_SLAVE_STATUS_OK, if this function returned successfully.
- * @par       Example
- * Sample code please refers to @ref HAL_SPI_SLAVE_Driver_Usage_Chapter.
- *
- * @sa #hal_spi_slave_get_master_read_config()
- */
-hal_spi_slave_status_t hal_spi_slave_send(hal_spi_slave_port_t spi_port, const uint8_t *data, uint32_t size);
-
 
 /**
  * @brief     This function queries the address and length from the config read command sent by the SPI master.
@@ -558,13 +537,12 @@ hal_spi_slave_status_t hal_spi_slave_send(hal_spi_slave_port_t spi_port, const u
  *
  * @sa #hal_spi_slave_send()
  */
-hal_spi_slave_status_t hal_spi_slave_get_master_read_config(hal_spi_slave_port_t spi_port, uint32_t *address, uint32_t *length);
 
 
 /**
  * @brief     This function receives data asynchronously.
  * @param[in] spi_port is the SPI slave port number, the value is defined at #hal_spi_slave_port_t.
- * @param[in] buffer is the data buffer where the received data are stored, this parameter cannot be NULL, also the address must be as non-cacheable address.
+ * @param[out] buffer is the data buffer where the received data are stored, this parameter cannot be NULL, also the address must be as non-cacheable address.
  * @param[in] size is the number of bytes to receive.
  * @return    #HAL_SPI_SLAVE_STATUS_ERROR_PORT, if the SPI slave port is invalid. \n
  *            #HAL_SPI_SLAVE_STATUS_INVALID_PARAMETER, if an invalid parameter is given by user. \n
@@ -621,34 +599,7 @@ hal_spi_slave_status_t hal_spi_slave_receive(hal_spi_slave_port_t spi_port, uint
  *
  * @sa #hal_spi_slave_receive()
  */
-hal_spi_slave_status_t hal_spi_slave_get_master_write_config(hal_spi_slave_port_t spi_port, uint32_t *address, uint32_t *length);
 
-
-/**
- * @brief     This function configures the SPI slave send MISO early half SCLK cycle parameter.
- * @param[in] spi_port is the SPI slave port number, the value is defined at #hal_spi_slave_port_t.
- * @param[in] early_miso is the parameter to enable the send MISO data half SCLK cycle early feature or disable it.
- * @return    #HAL_SPI_SLAVE_STATUS_ERROR_PORT, if the SPI slave port is invalid. \n
- *            #HAL_SPI_SLAVE_STATUS_INVALID_PARAMETER, if an invalid parameter is given by user. \n
- *            #HAL_SPI_SLAVE_STATUS_OK, if this function returned successfully.
- * @par       Example
- * Sample code please refers to @ref HAL_SPI_SLAVE_Driver_Usage_Chapter.
- */
-hal_spi_slave_status_t hal_spi_slave_set_early_miso(hal_spi_slave_port_t spi_port, hal_spi_slave_early_miso_t early_miso);
-
-
-/**
- * @brief     This function configures the SPI slave command value.
- * @param[in] spi_port is the SPI slave port number, the value is defined at #hal_spi_slave_port_t.
- * @param[in] command is the SPI slave command type, the value is defined at #hal_spi_slave_command_type_t.
- * @param[in] value is the command value that needs to be configured.
- * @return    #HAL_SPI_SLAVE_STATUS_ERROR_PORT, if the SPI slave port is invalid. \n
- *            #HAL_SPI_SLAVE_STATUS_INVALID_PARAMETER, if an invalid parameter is given by user. \n
- *            #HAL_SPI_SLAVE_STATUS_OK, if this function returned successfully.
- * @par       Example
- * Sample code please refers to @ref HAL_SPI_SLAVE_Driver_Usage_Chapter.
- */
-hal_spi_slave_status_t hal_spi_slave_set_command(hal_spi_slave_port_t spi_port, hal_spi_slave_command_type_t command, uint8_t value);
 #else
 /**
  * @brief     This function initializes the SPI slave and sets user defined common parameters including

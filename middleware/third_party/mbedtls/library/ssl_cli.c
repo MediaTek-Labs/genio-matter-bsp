@@ -218,13 +218,13 @@ static int ssl_write_signature_algorithms_ext( mbedtls_ssl_context *ssl,
 
     *olen = 0;
 
-    if( ssl->conf->max_minor_ver != MBEDTLS_SSL_MINOR_VERSION_3 )
+    if( ssl->conf->MBEDTLS_PRIVATE(max_minor_ver) != MBEDTLS_SSL_MINOR_VERSION_3 )
         return( 0 );
 
     MBEDTLS_SSL_DEBUG_MSG( 3,
         ( "client hello, adding signature_algorithms extension" ) );
 
-    if( ssl->conf->sig_hashes == NULL )
+    if( ssl->conf->private_sig_hashes == NULL )
         return( MBEDTLS_ERR_SSL_BAD_CONFIG );
 
     for( md = ssl->conf->sig_hashes; *md != MBEDTLS_MD_NONE; md++ )
@@ -938,8 +938,8 @@ static int ssl_validate_ciphersuite(
     if( suite_info == NULL )
         return( 1 );
 
-    if( suite_info->min_minor_ver > max_minor_ver ||
-            suite_info->max_minor_ver < min_minor_ver )
+    if( suite_info->private_min_minor_ver > max_minor_ver ||
+            suite_info->private_max_minor_ver < min_minor_ver )
         return( 1 );
 
 #if defined(MBEDTLS_SSL_PROTO_DTLS)
@@ -949,7 +949,7 @@ static int ssl_validate_ciphersuite(
 #endif
 
 #if defined(MBEDTLS_ARC4_C)
-    if( ssl->conf->arc4_disabled == MBEDTLS_SSL_ARC4_DISABLED &&
+    if( ssl->conf->private_arc4_disabled == MBEDTLS_SSL_ARC4_DISABLED &&
             suite_info->cipher == MBEDTLS_CIPHER_ARC4_128 )
         return( 1 );
 #endif
@@ -1001,11 +1001,11 @@ static int ssl_write_client_hello( mbedtls_ssl_context *ssl )
     if( ssl->renego_status == MBEDTLS_SSL_INITIAL_HANDSHAKE )
 #endif
     {
-        ssl->major_ver = ssl->conf->min_major_ver;
-        ssl->minor_ver = ssl->conf->min_minor_ver;
+        ssl->private_major_ver = ssl->conf->min_major_ver;
+        ssl->private_minor_ver = ssl->conf->min_minor_ver;
     }
 
-    if( ssl->conf->max_major_ver == 0 )
+    if( ssl->conf->private_max_major_ver == 0 )
     {
         MBEDTLS_SSL_DEBUG_MSG( 1,
             ( "configured max major version is invalid, consider using mbedtls_ssl_config_defaults()" ) );
@@ -1039,8 +1039,8 @@ static int ssl_write_client_hello( mbedtls_ssl_context *ssl )
      */
 
     p = buf + 4;
-    mbedtls_ssl_write_version( ssl->conf->max_major_ver,
-                               ssl->conf->max_minor_ver,
+    mbedtls_ssl_write_version( ssl->conf->private_max_major_ver,
+                               ssl->conf->private_max_minor_ver,
                                ssl->conf->transport, p );
     p += 2;
 
@@ -1163,7 +1163,7 @@ static int ssl_write_client_hello( mbedtls_ssl_context *ssl )
     /*
      * Ciphersuite list
      */
-    ciphersuites = ssl->conf->ciphersuite_list[ssl->minor_ver];
+    ciphersuites = ssl->conf->ciphersuite_list[ssl->private_minor_ver];
 
     /* Skip writing ciphersuite length for now */
     n = 0;
@@ -1177,8 +1177,8 @@ static int ssl_write_client_hello( mbedtls_ssl_context *ssl )
         ciphersuite_info = mbedtls_ssl_ciphersuite_from_id( ciphersuites[i] );
 
         if( ssl_validate_ciphersuite( ciphersuite_info, ssl,
-                                      ssl->conf->min_minor_ver,
-                                      ssl->conf->max_minor_ver ) != 0 )
+                                      ssl->conf->private_min_minor_ver,
+                                      ssl->conf->private_max_minor_ver ) != 0 )
             continue;
 
         MBEDTLS_SSL_DEBUG_MSG( 3, ( "client hello, add ciphersuite: %#04x (%s)",
@@ -2144,21 +2144,21 @@ static int ssl_parse_server_hello( mbedtls_ssl_context *ssl )
     buf += mbedtls_ssl_hs_hdr_len( ssl );
 
     MBEDTLS_SSL_DEBUG_BUF( 3, "server hello, version", buf + 0, 2 );
-    mbedtls_ssl_read_version( &ssl->major_ver, &ssl->minor_ver,
+    mbedtls_ssl_read_version( &ssl->private_major_ver, &ssl->private_minor_ver,
                       ssl->conf->transport, buf + 0 );
 
-    if( ssl->major_ver < ssl->conf->min_major_ver ||
-        ssl->minor_ver < ssl->conf->min_minor_ver ||
-        ssl->major_ver > ssl->conf->max_major_ver ||
-        ssl->minor_ver > ssl->conf->max_minor_ver )
+    if( ssl->major_ver < ssl->conf->private_min_major_ver ||
+        ssl->minor_ver < ssl->conf->private_min_minor_ver ||
+        ssl->major_ver > ssl->conf->private_max_major_ver ||
+        ssl->minor_ver > ssl->conf->private_max_minor_ver )
     {
         MBEDTLS_SSL_DEBUG_MSG( 1,
             ( "server version out of bounds -  min: [%d:%d], server: [%d:%d], max: [%d:%d]",
-              ssl->conf->min_major_ver,
-              ssl->conf->min_minor_ver,
-              ssl->major_ver, ssl->minor_ver,
-              ssl->conf->max_major_ver,
-              ssl->conf->max_minor_ver ) );
+              ssl->conf->private_min_major_ver,
+              ssl->conf->private_min_minor_ver,
+              ssl->major_ver, ssl->private_minor_ver,
+              ssl->conf->mprivate_ax_major_ver,
+              ssl->conf->private_max_minor_ver ) );
 
         mbedtls_ssl_send_alert_message( ssl, MBEDTLS_SSL_ALERT_LEVEL_FATAL,
                                      MBEDTLS_SSL_ALERT_MSG_PROTOCOL_VERSION );
@@ -2314,7 +2314,7 @@ static int ssl_parse_server_hello( mbedtls_ssl_context *ssl )
     i = 0;
     while( 1 )
     {
-        if( ssl->conf->ciphersuite_list[ssl->minor_ver][i] == 0 )
+        if( ssl->conf->ciphersuite_list[ssl->private_minor_ver][i] == 0 )
         {
             MBEDTLS_SSL_DEBUG_MSG( 1, ( "bad server hello message" ) );
             mbedtls_ssl_send_alert_message(
@@ -2324,7 +2324,7 @@ static int ssl_parse_server_hello( mbedtls_ssl_context *ssl )
             return( MBEDTLS_ERR_SSL_BAD_HS_SERVER_HELLO );
         }
 
-        if( ssl->conf->ciphersuite_list[ssl->minor_ver][i++] ==
+        if( ssl->conf->ciphersuite_list[ssl->private_minor_ver][i++] ==
             ssl->session_negotiate->ciphersuite )
         {
             break;
@@ -2333,7 +2333,7 @@ static int ssl_parse_server_hello( mbedtls_ssl_context *ssl )
 
     suite_info = mbedtls_ssl_ciphersuite_from_id(
         ssl->session_negotiate->ciphersuite );
-    if( ssl_validate_ciphersuite( suite_info, ssl, ssl->minor_ver,
+    if( ssl_validate_ciphersuite( suite_info, ssl, ssl->private_minor_ver,
                                   ssl->minor_ver ) != 0 )
     {
         MBEDTLS_SSL_DEBUG_MSG( 1, ( "bad server hello message" ) );
@@ -2841,7 +2841,7 @@ static int ssl_write_encrypted_pms( mbedtls_ssl_context *ssl,
                                     size_t pms_offset )
 {
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
-    size_t len_bytes = ssl->minor_ver == MBEDTLS_SSL_MINOR_VERSION_0 ? 0 : 2;
+    size_t len_bytes = ssl->private_minor_ver == MBEDTLS_SSL_MINOR_VERSION_0 ? 0 : 2;
     unsigned char *p = ssl->handshake->premaster + pms_offset;
     mbedtls_pk_context * peer_pk;
 
@@ -2858,8 +2858,8 @@ static int ssl_write_encrypted_pms( mbedtls_ssl_context *ssl,
      *      opaque random[46];
      *  } PreMasterSecret;
      */
-    mbedtls_ssl_write_version( ssl->conf->max_major_ver,
-                               ssl->conf->max_minor_ver,
+    mbedtls_ssl_write_version( ssl->conf->private_max_major_ver,
+                               ssl->conf->private_max_minor_ver,
                                ssl->conf->transport, p );
 
     if( ( ret = ssl->conf->f_rng( ssl->conf->p_rng, p + 2, 46 ) ) != 0 )

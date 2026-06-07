@@ -342,6 +342,13 @@ extern "C" {
 #define BGF_IP_VERSION                  (BGF_REG_INFO_BASE_ADDR + 0x10)
 #define BGF_IP_VER_ID                   0x02040100
 
+/*
+ * AP2CONN_INFRA coex share memory:
+ *  conninfra share memory for wifi bt coex
+ */
+#define COEX_EX_BUF_SHARING_PARAM_ADDR       0x60051A00
+#define COEX_EX_BUF_SHARING_PARAM_SIZE       2048
+
 //---------------------------------------------------------------------------
 #define SET_BIT(addr, bit) \
             (*((volatile uint32_t *)(addr))) |= ((uint32_t)bit)

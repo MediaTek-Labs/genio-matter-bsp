@@ -812,7 +812,6 @@ struct MSDU_INFO {
 	PFN_TX_DONE_HANDLER pfTxDoneHandler;	/* Tx done handler */
 	uint32_t u4TxDoneTag;	/* Tag for data frame Tx done log */
 	uint8_t ucPktType;
-	struct TIMER rLifetimeTimer;
 
 #if CFG_ENABLE_PKT_LIFETIME_PROFILE
 	struct PKT_PROFILE rPktProfile;
@@ -1806,9 +1805,6 @@ uint32_t nicTxGetMsduPendingCnt(IN struct ADAPTER *prAdapter);
 
 uint32_t nicTxMsduQueue(IN struct ADAPTER *prAdapter,
 	uint8_t ucPortIdx, struct QUE *prQue);
-
-void nicTxMsduLifeTimeoutHandler(IN struct ADAPTER *prAdapter,
-	IN unsigned long plParamPtr);
 
 uint32_t nicTxCmd(IN struct ADAPTER *prAdapter,
 	IN struct CMD_INFO *prCmdInfo, IN uint8_t ucTC);

@@ -657,6 +657,7 @@ struct STA_RECORD {
 
 	/* TX key is ready */
 	u_int8_t fgIsTxKeyReady;
+	u_int8_t fg1xKey4Done;
 
 	/* When the STA is connected or TX key is ready */
 	u_int8_t fgIsTxAllowed;
@@ -764,6 +765,7 @@ struct STA_RECORD {
 	uint32_t au4RxV1[MCS_INFO_SAMPLE_CNT];
 	uint32_t au4RxV2[MCS_INFO_SAMPLE_CNT];
 #endif
+	uint8_t ucSapRemoveDisable;
 };
 
 #if 0

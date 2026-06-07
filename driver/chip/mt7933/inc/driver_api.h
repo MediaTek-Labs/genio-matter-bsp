@@ -38,8 +38,13 @@
 
 
 /// I/O    ////////////////////////////////////////////////////////////////////
+#ifndef OUTREG32
 #define OUTREG32(a,b)   (*(volatile unsigned int *)(a) = (unsigned int)b)
+#endif /* #ifndef OUTREG32 */
+#ifndef INREG32
 #define INREG32(a)      (*(volatile unsigned int *)(a))
+#endif /* #ifndef INREG32 */
+
 #define OUTREG16(a,b)   (*(volatile unsigned short *)(a) = (unsigned short)b)
 #define INREG16(a)      (*(volatile unsigned short *)(a))
 

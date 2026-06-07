@@ -503,10 +503,14 @@ static inline int wpa_drv_cancel_remain_on_channel(
 static inline int wpa_drv_probe_req_report(struct wpa_supplicant *wpa_s,
 					   int report)
 {
+#if defined (__MTK_MT7933_P2P_SUPPORT__)
+	return 0;
+#else
 	if (wpa_s->driver->probe_req_report)
 		return wpa_s->driver->probe_req_report(wpa_s->drv_priv,
-						       report);
+						report);
 	return -1;
+#endif
 }
 
 static inline int wpa_drv_deinit_ap(struct wpa_supplicant *wpa_s)

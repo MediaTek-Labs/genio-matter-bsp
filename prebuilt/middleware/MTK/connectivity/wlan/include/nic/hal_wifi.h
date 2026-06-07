@@ -459,7 +459,17 @@ do { \
 
 #define HAL_CFG_MAX_HIF_RX_LEN_NUM(_prAdapter, _ucNumOfRxLen)
 
-#define HAL_SET_INTR_STATUS_READ_CLEAR(prAdapter)
+/* update cmd ring sw use cnt before clear int status for Tx resource counting
+ */
+#define HAL_SET_INTR_STATUS_READ_CLEAR(prAdapter) \
+{ \
+	struct RTMP_TX_RING *prTxRing; \
+	prTxRing = &prAdapter->prGlueInfo->rHifInfo.TxRing[TX_RING_CMD_IDX_2]; \
+	taskENTER_CRITICAL(); \
+	if (prTxRing->u4UsedCnt != 0) \
+		prTxRing->u4UsedCnt -= prTxRing->TxSwUsedIdx; \
+	taskEXIT_CRITICAL(); \
+}
 
 #define HAL_SET_INTR_STATUS_WRITE_1_CLEAR(prAdapter)
 
@@ -511,6 +521,16 @@ do { \
 	prBusInfo = _prAdapter->chip_info->bus_info; \
 	if (prBusInfo->devReadIntStatus) \
 		prBusInfo->devReadIntStatus(_prAdapter, _pu4IntStatus); \
+	else \
+		kalDevReadIntStatus(_prAdapter, _pu4IntStatus);\
+}
+
+#define HAL_READ_INT_STATUS_NOT_CLR(_prAdapter, _pu4IntStatus) \
+{ \
+	struct BUS_INFO *prBusInfo; \
+	prBusInfo = _prAdapter->chip_info->bus_info; \
+	if (prBusInfo->devReadIntStatus) \
+		prBusInfo->devReadIntStatusNotClr(_prAdapter, _pu4IntStatus); \
 	else \
 		kalDevReadIntStatus(_prAdapter, _pu4IntStatus);\
 }

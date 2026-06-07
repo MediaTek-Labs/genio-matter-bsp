@@ -21,7 +21,7 @@
  *  limitations under the License.
  */
 
-#include "mbedtls/pkcs11.h"
+#include "mbedtls/old/pkcs11.h"
 
 #if defined(MBEDTLS_PKCS11_C)
 

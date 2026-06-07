@@ -237,9 +237,15 @@ extern "C" {
 #define WIFI_MODE_MONITOR       (4)
 
 /**
+* @brief P2P GC mode. In this mode, the device can connect to P2P GO and use
+* WIFI_PORT_STA.
+*/
+#define WIFI_MODE_P2P_GC_ONLY (5)
+
+/**
 * @brief Supports Wi-Fi Direct feature.
 */
-#define WIFI_MODE_P2P_ONLY          (5)
+#define WIFI_MODE_P2P_ONLY (6)
 /**
 * @brief Specifies the STA operation.
 */

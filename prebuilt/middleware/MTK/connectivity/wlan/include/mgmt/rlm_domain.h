@@ -576,7 +576,7 @@
 #define BAND_2G4_UPPER_BOUND 14
 /*5G SubBand FCC spec*/
 #define UNII1_LOWER_BOUND    36
-#define UNII1_UPPER_BOUND    48
+#define UNII1_UPPER_BOUND    50
 #define UNII2A_LOWER_BOUND   52
 #define UNII2A_UPPER_BOUND   64
 #define UNII2C_LOWER_BOUND   100
@@ -1094,6 +1094,10 @@ void rlmDomainGetDfsChnls(struct ADAPTER *prAdapter,
 void rlmDomainSendCmd(struct ADAPTER *prAdapter);
 
 void rlmDomainSendDomainInfoCmd(struct ADAPTER *prAdapter);
+
+void rlmDomainUpdateAdaptPassiveScan(void);
+
+void rlmDomainUpdateAdaptPassiveScanShorterDFS(void);
 
 void rlmDomainSendPassiveScanInfoCmd(struct ADAPTER
 				     *prAdapter);

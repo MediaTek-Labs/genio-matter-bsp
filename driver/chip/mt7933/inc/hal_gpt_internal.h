@@ -55,7 +55,7 @@ extern "C"
 
 #define HAL_GPT_MS_PORT             HAL_GPT_5       /* configure HAL_GPT_5 as milliseconds timer */
 #define HAL_GPT_US_PORT             HAL_GPT_4       /* configure HAL_GPT_4 as microseconds timer */
-#define HAL_GPT_SW_PORT             HAL_GPT_3       /* configure HAL_GPT_3 as software timer */
+#define HAL_GPT_SW_PORT             HAL_GPT_2       /* configure HAL_GPT_2 as software timer */
 #define HAL_GPT_SW_NUMBER           32              /* SW GPT support maximal task number*/
 #define HAL_GPT_SW_MAGIC            0xdead0000      /* SW GPT magic handle number*/
 #define HAL_GPT_SW_HANDLE_MASK      0xffff          /* SW GPT handle mask section*/

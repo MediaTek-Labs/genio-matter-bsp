@@ -142,6 +142,7 @@ int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx,
 int mbedtls_internal_sha1_process( mbedtls_sha1_context *ctx,
                                    const unsigned char data[64] );
 
+#if 0
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
 #if defined(MBEDTLS_DEPRECATED_WARNING)
 #define MBEDTLS_DEPRECATED      __attribute__((deprecated))
@@ -160,7 +161,7 @@ int mbedtls_internal_sha1_process( mbedtls_sha1_context *ctx,
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_sha1_starts( mbedtls_sha1_context *ctx );
+MBEDTLS_DEPRECATED int mbedtls_sha1_starts( mbedtls_sha1_context *ctx );
 
 /**
  * \brief          SHA-1 process buffer
@@ -176,7 +177,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha1_starts( mbedtls_sha1_context *ctx );
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_sha1_update( mbedtls_sha1_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_sha1_update( mbedtls_sha1_context *ctx,
                                              const unsigned char *input,
                                              size_t ilen );
 
@@ -193,7 +194,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha1_update( mbedtls_sha1_context *ctx,
  *                 stronger message digests instead.
  *
  */
-MBEDTLS_DEPRECATED void mbedtls_sha1_finish( mbedtls_sha1_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_sha1_finish( mbedtls_sha1_context *ctx,
                                              unsigned char output[20] );
 
 /**
@@ -214,7 +215,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha1_process( mbedtls_sha1_context *ctx,
 
 #undef MBEDTLS_DEPRECATED
 #endif /* !MBEDTLS_DEPRECATED_REMOVED */
-
+#endif
 #ifdef __cplusplus
 }
 #endif

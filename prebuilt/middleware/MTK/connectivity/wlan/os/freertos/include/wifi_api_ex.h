@@ -467,13 +467,31 @@ extern "C" {
 #define WIFI_MAX_NUMBER_OF_STA (16)
 
 /**@brief The maximum length of passphrase used in WPA-PSK and WPA2-PSK
- * encryption types.
+* encryption types.
 */
 #define WIFI_LENGTH_PASSPHRASE (64)
 
+/**@brief The maximum length of identity used User-identity based
+ * EAP method in WPA-Enterprise encryption types
+ */
+#define WIFI_LENGTH_WPA_UID (256)
+
+
+/**@brief The maximum length of passphrase used User-identity based
+ * EAP method in WPA-Enterprise encryption types.
+ */
+#define WIFI_LENGTH_WPA_PWD (256)
+
+
+/**@brief The maximum length of EAP-TLS client key password in WPA-Enterprise
+ * encryption types.
+ */
+#define WIFI_LENGTH_WPA_PKPWD (256)
+
+
 /**@brief The maximum length of PMK used in WPA-PSK and WPA2-PSK encryption
  * types.
-*/
+ */
 #define WIFI_LENGTH_PMK (32)
 
 /**@brief The hapd buffer in a profile.
@@ -569,9 +587,15 @@ extern "C" {
 #define WIFI_MODE_MONITOR (4)
 
 /**
+ * @brief P2P GC mode. In this mode, the device can connect to P2P GO and use
+ * WIFI_PORT_STA.
+ */
+#define WIFI_MODE_P2P_GC_ONLY (5)
+
+/**
 * @brief Supports Wi-Fi Direct feature.
 */
-#define WIFI_MODE_P2P_ONLY (5)
+#define WIFI_MODE_P2P_ONLY (6)
 /**
 * @brief Specifies the STA operation.
 */
@@ -632,6 +656,59 @@ extern "C" {
 #define WIFI_2G_CHANNEL_NUMBER            (14)    /**channel 1 ~14*/
 #define WIFI_2G_SKU_POWER_PER_CHANNEL     (19)
 
+/**
+* @brief wow type for wow handler registration
+*/
+#define WIFI_WOW_TYPE_MAGIC     (0)
+#define WIFI_WOW_TYPE_IP_DATA   (1)
+#define WIFI_WOW_TYPE_MC_DATA   (2)
+#define WIFI_WOW_TYPE_NUM       (3)
+
+#ifdef MTK_MINISUPP_ENABLE
+/**
+ * Parameters for EAP-TLS authentication method.
+ *
+ * Users can manually adjust these parameters based on their
+ * certificate requirements.
+ * Please ensure aligned with the actual certificate size and
+ * memory layout when making adjustments.
+ *
+ * [Adjustable Parameters]
+ * DEFAULT_EAP_CERT_ADDR_CRT:
+ * The starting address in memory where the client certificate is located.
+ * DEFAULT_EAP_CERT_ADDR_KEY:
+ * The starting address in memory where the client key is located.
+ * DEFAULT_EAP_CERT_ADDR_CRT_LEN:
+ * The length of the client certificate stored in memory.
+ * DEFAULT_EAP_CERT_ADDR_KEY_LEN:
+ * The length of the client key stored in memory.
+ */
+
+
+#ifdef MTK_IEEE8021X_ENABLE
+/**
+ * Default certificate address is set to the start of the certificate in ROM_CA
+ * Default key address is set to the start of the key in ROM_CA + 2KB
+ * The actual certificate and key address may vary depending on the
+ * certificate used.
+ */
+extern int _rom_ca_start[];
+#define DEFAULT_EAP_CERT_ADDR_CRT     ((uint32_t) _rom_ca_start)
+#define DEFAULT_EAP_CERT_ADDR_KEY     (DEFAULT_EAP_CERT_ADDR_CRT + 2048)
+
+/**
+ * Default certificate length is 872 bytes for certificate and 1704 bytes
+ * for key in PEM format
+ * The actual certificate and key length may vary depending on the
+ * certificate used.
+ */
+#define DEFAULT_EAP_CERT_ADDR_CRT_LEN 872
+#define DEFAULT_EAP_CERT_ADDR_KEY_LEN 1704
+#endif
+
+#endif /* #ifdef MTK_MINISUPP_ENABLE */
+
+
 /**@defgroup WIFI_ENUM Enumeration
 * @{
 */
@@ -667,8 +744,30 @@ typedef enum {
 	WIFI_EVENT_IOT_IPV6_ADDR_READY, /**< IPv6 addr ready event. */
 	WIFI_EVENT_IOT_CSI_DATA_NOTIFICATION,
 	/**<  Notify the application to collect csi raw data. */
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+	WIFI_EVENT_IOT_P2P_EVENT,
+#endif
 	WIFI_EVENT_MAX_NUMBER,
 } wifi_event_t;
+
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+enum p2p_sub_event {
+	P2P_DEV_FOUND = 8, /**< p2p device found event. */
+	P2P_RECV_SD_REP, /**< p2p receive SD response event. */
+	P2P_WPS_FAILED, /**< p2p WPS failed event. */
+	P2P_WPS_SEND_M2D, /**< pin code error. */
+	P2P_GROUP_STARTED, /**< p2p group started event. */
+	P2P_GROUP_FORMATION_FAILURE, /**< p2p group formation failure event. */
+	P2P_GROUP_REMOVED, /**< p2p group removed event. */
+};
+
+struct p2p_event_data {
+	enum p2p_sub_event p2pId;
+	char addr[18];
+	char *data;
+	uint32_t dataLen;
+};
+#endif
 
 /** @brief This enumeration defines the event type of the roaming
 * WIFI_EVENT_IOT_ROAM_RUNNING event in #wifi_event_t.
@@ -682,6 +781,15 @@ enum WIFI_ROAM_EVENT_TYPE {
 	WIFI_ROAM_EVENT_BY_BCN_MISSCOUNT,
 };
 
+#if CFG_SUPPORT_SCAN_CH_TIME
+/** @brief This enumeration defines the scan type
+* Find the details for the roam type below.
+*/
+enum WIFI_SCAN_TYPE {
+	WIFI_ACTIVE_SCAN,
+	WIFI_PASSIVE_SCAN,
+};
+#endif
 
 /** @brief This enumeration defines the reason code of the
 * WIFI_EVENT_IOT_CONNECTION_FAILED event in #wifi_event_t.
@@ -852,12 +960,12 @@ typedef enum {
 	WIFI_AUTH_MODE_OPEN = 0,	 /**< Open mode.     */
 	WIFI_AUTH_MODE_SHARED,		 /**< Not supported. */
 	WIFI_AUTH_MODE_AUTO_WEP,	 /**< Not supported. */
-	WIFI_AUTH_MODE_WPA,		 /**< Not supported. */
+	WIFI_AUTH_MODE_WPA,		 /**< WPA-Enterprise. */
 	WIFI_AUTH_MODE_WPA_PSK,		 /**< WPA_PSK.       */
 	WIFI_AUTH_MODE_WPA_None,	 /**< Not supported. */
-	WIFI_AUTH_MODE_WPA2,		 /**< Not supported. */
+	WIFI_AUTH_MODE_WPA2,		 /**< WPA-Enterprise. */
 	WIFI_AUTH_MODE_WPA2_PSK,	 /**< WPA2_PSK.      */
-	WIFI_AUTH_MODE_WPA_WPA2,	 /**< Not supported. */
+	WIFI_AUTH_MODE_WPA_WPA2,	 /**< WPA-Enterprise. */
 	WIFI_AUTH_MODE_WPA_PSK_WPA2_PSK, /**< Mixture mode.  */
 	WIFI_AUTH_MODE_WPA3,         /**< Not supported. */
     WIFI_AUTH_MODE_WPA3_PSK,     /**< WPA3_PSK.      */
@@ -866,8 +974,9 @@ typedef enum {
     WIFI_AUTH_MODE_MAX,
 } wifi_auth_mode_t;
 
+
 /** @brief This enumeration defines the wireless encryption type to indicate the
- * Wi-Fi device’s encryption attribute.
+* Wi-Fi device’s encryption attribute.
 */
 typedef enum {
 	WIFI_ENCRYPT_TYPE_WEP_ENABLED = 0, /**< WEP encryption type.  */
@@ -912,6 +1021,15 @@ enum WIFI_ENCRYPT_LEVEL {
 	WIFI_ENCLEVEL_GCMP_256 = 4,
 	WIFI_ENCLEVEL_TKIPCCMP = 5,
 };
+
+#ifdef MTK_IEEE8021X_ENABLE
+/* @brief This is enumeration for certificate type
+ */
+enum WIFI_EAP_CERT_TYPE {
+	WIFI_EAP_CERT_TYPE_CLIENT_CERT = 0,
+	WIFI_EAP_CERT_TYPE_CLIENT_KEY  = 1,
+};
+#endif
 
 /** @brief This enumeration defines the wireless physical mode.
 */
@@ -1074,6 +1192,16 @@ typedef enum {
 	/**< WPS process failed. This method of security is not supproted */
 	WPS_STATUS_MAX_NUMER
 } wps_status_t;
+
+/** @brief This enumeration defines the antenna diversity mode.
+*/
+enum enum_antdiv_mode_t {
+	ENUM_ANTDIV_MODE_FORCE_ANT0,
+	ENUM_ANTDIV_MODE_FORCE_ANT1,
+	ENUM_ANTDIV_MODE_AUTO,
+	ENUM_ANTDIV_MODE_DISABLE, /* for unsupported HW */
+	ENUM_ANTDIV_MODE_NUM
+};
 
 /**
 * @}
@@ -1260,6 +1388,9 @@ typedef struct {
 	uint8_t ap_dtim_interval; /**< The DTIM interval setting for AP. The
 				     interval range is from 1 to 255 beacon
 				     intervals. */
+	uint8_t coex_submode;  /* The COEX. mode. The value should be 0 for
+				* TDD mode and 1 for 2ANT FDD + SOB mode
+				*/
 
 } wifi_config_ext_t;
 
@@ -1597,9 +1728,21 @@ struct wifi_twt_params_t {
 	uint8_t ucTWTWakeIntervalExponent;
 	uint8_t ucTWTProtection;
 	uint8_t ucTWTMinWakeDuration;
-	uint8_t ucTWTWakeIntervalMantissa;
+	uint16_t u2TWTWakeIntervalMantissa;
 };
-
+#ifdef MTK_IEEE8021X_ENABLE
+/**
+ * @brief A union allowing to interpret a uint32_t as an array of uint8_t
+ *
+ * This union is useful when we want to access or manipulate individual byte
+ * 32-bit integer, which might be necessary in various contexts like bitwise
+ * operations, efficient memory storage, communication protocols and so on.
+ */
+union uint32_to_u8 {
+	uint32_t num;   // Represents the number as u32
+	uint8_t arr[4]; // Array presentation to bytes
+};
+#endif
 /**
 *@}
 */
@@ -1913,7 +2056,7 @@ int32_t wifi_config_get_channel(uint8_t port, uint8_t *channel);
 * @return >=0 means success, <0 means fail
 */
 int32_t wifi_config_set_multi_channel(uint8_t port, uint8_t *channel,
-				      uint8_t channel_len);
+	uint8_t channel_len);
 
 /**
 * @brief Get the channel of the connected AP.
@@ -1923,6 +2066,158 @@ int32_t wifi_config_set_multi_channel(uint8_t port, uint8_t *channel,
 * @return  >=0 means success, <0 means fail
 */
 int32_t wifi_config_get_chbw(uint8_t port, uint8_t *chbw);
+
+#ifdef MTK_IEEE8021X_ENABLE
+/**
+ * @brief Sets up the WiFi EAP User ID.
+ *
+ * EAP - Extensible Authentication Protocol.
+ *
+ * @param [IN] port: Defines the port usage type.
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [IN] user_id: Pointer to the UserID for the WiFi EAP.
+ * @param [IN] user_id_len: Length of the UserID.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_set_eap_user_id(uint8_t port, uint8_t *user_id,
+	uint32_t user_id_len);
+
+/**
+ * @brief Retrieves the WiFi EAP User ID.
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [OUT] user_id_buf: Buffer to store the EAP User ID.
+ * @param [OUT] user_id_len: Stores the length of the fetched EAP User ID.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_get_eap_user_id(uint8_t port, uint8_t *user_id_buf,
+	uint32_t *user_id_len);
+
+/**
+ * @brief Sets up the WiFi EAP User Password
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [IN] pwd: Pointer to the User Password for the WiFi EAP.
+ * @param [IN] pwd_len: Length of the User Password.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_set_eap_user_pwd(uint8_t port, uint8_t *pwd,
+	uint32_t pwd_len);
+
+/**
+ * @brief Retrieves the WiFi EAP User Password.
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [OUT] pwd_buf: Buffer to store the EAP User Password.
+ * @param [OUT] pwd_len: Stores the length of the fetched EAP User Password.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_get_eap_user_pwd(uint8_t port, uint8_t *pwd_buf,
+	uint32_t *pwd_len);
+
+/**
+ * @brief Sets the WiFi EAP Type.
+ *
+ * EAP type of authentication method
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [IN] MTK_EAP_type: Specifies the EAP type.
+ *
+ * @return Returns a success status. Integer >=0 signifies success,
+ * <0 indicates failure.
+ */
+int32_t wifi_config_set_eap_type(uint8_t port,
+	uint8_t MTK_EAP_type);
+
+/**
+ * @brief Gets the WiFi EAP Type.
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [OUT] MTK_EAP_type: EAP type.
+ * Returned type will be one of the defined types listed in wifi_config_set_eap.
+ *
+ * @return Returns a success status. Integer >=0 signifies success,
+ * <0 indicates failure.
+ */
+int32_t wifi_config_get_eap_type(uint8_t port,
+	uint8_t *MTK_EAP_type);
+
+/**
+ * @brief Sets up the load Certificate Authority (CA) configuration for EAP-TLS.
+ *
+ * @param [IN] port: Defines the port usage type
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [IN] cert_type
+ * @param [IN] start_addr: Provides the starting Address of Certificate data.
+ * @param [IN] length: Provides the Length of the Certification data.
+ *
+ * @return Returns a success status. Integer >=0 indicates success,
+ * <0 signifies failure.
+ */
+int32_t wifi_config_set_load_cert(uint8_t port, uint8_t cert_type,
+	uint32_t start_addr, uint32_t length);
+
+/**
+ * @brief Sets up the WiFi EAP-TLS Client Private Key Password.
+ *
+ * @param [IN] port: Defines the port usage type.
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [IN] key_pwd: Pointer to the Client Private Key Password
+ * @param [IN] key_pwd_len: Length of the Client Private Key Password.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_set_eap_key_pwd(uint8_t port, uint8_t *key_pwd,
+	uint32_t key_pwd_len);
+
+
+/**
+ * @brief Retrieves the WiFi EAP-TLS Client Private Key Password.
+ *
+ * @param [IN] port: Defines the port usage type.
+ *     * 0 - Access Point (AP)
+ *     * 1 - Access Point Client (AP Client)
+ *     * 2 - Station (STA)
+ * @param [OUT] key_pwd_buf: Buffer to store Client Private Key Password
+ * @param [OUT] key_pwd_len: Length of fetched Client Private Key Password.
+ *
+ * @return Returns a success status. A value >=0 indicates success,
+ * while a value <0 signifies failure.
+ */
+int32_t wifi_config_get_eap_key_pwd(uint8_t port, uint8_t *key_pwd_buf,
+	uint32_t *key_pwd_len);
+
+#endif /* MTK_IEEE8021X_ENABLE */
 
 /**
 * @brief This function gets the wireless mode that the Wi-Fi driver uses for a
@@ -2867,6 +3162,18 @@ int32_t wifi_config_set_country_code(wifi_country_code_t *wifi_country_code);
 */
 int32_t wifi_config_get_country_code(wifi_country_code_t *wifi_country_code);
 
+#if CFG_SUPPORT_REG_RULES
+/**
+* @brief Check the allowed channel in 2.4G/5G base on the specific country code.
+*
+* @param [IN] channel, country code
+*
+* @return  >=0 means success, <0 means fail
+*/
+int32_t wifi_config_reg_rules_allow_channel(uint8_t channel,
+						uint8_t *country_code);
+#endif
+
 /**
 * @deprecated This function is deprecated! This function gets the country region
 * that the Wi-Fi driver uses for a specific wireless port.
@@ -3543,6 +3850,37 @@ int32_t wifi_config_register_rx_handler(wifi_rx_handler_t wifi_rx_handler);
  *
  */
 int32_t wifi_config_unregister_rx_handler(void);
+
+
+/**
+* @brief Register the handler to handle wakeup packet when wow enable
+*
+* @param [IN]wifi_rx_handler: handler routine
+* @param [IN]type: wakeup protect type
+*                  (0: magic packet,
+*                  1: other IP data,
+*                  2: other MC data)
+
+* @return >=0 means success, <0 means fail
+*
+*/
+int32_t wifi_config_register_wow_handler(
+	wifi_rx_handler_t wifi_rx_handler,
+	uint8_t type);
+
+/**
+* @brief Unregister the handler to handle wakeup packet when wow enable
+*
+* @param [IN]type: wakeup protect type
+*                  (0: magic packet,
+*                  1: other IP data,
+*                  2: other MC data)
+*
+* @return >=0 means success, <0 means fail
+*
+*/
+int32_t wifi_config_unregister_wow_handler(uint8_t type);
+
 
 /**
 * @brief This function gets the Wi-Fi RX filter used in the Wi-Fi driver. The RX
@@ -4268,6 +4606,37 @@ int32_t wifi_config_get_autoroam(uint8_t port,
 #endif
 
 int32_t wifi_config_set_ser(uint8_t value);
+
+#if CFG_SUPPORT_SCAN_CH_TIME
+/**
+* @brief Set scan dwell time
+*
+* @param [In]scan_mode  0:active; 1:passive
+* @param [In]dwell_time
+*
+* @return >0 means success, <0 means fail
+*/
+int32_t wifi_config_set_dwll_time(uint8_t scan_option,
+	uint8_t dwell_time);
+
+/**
+* @brief This function sets the dwell time when MT7931 turn to active scan
+* on DFS channel, the default dwell time of active scan refer to the
+* active scan dwell time of wifi_config_set_dwll_time.
+* MT7931 listen the beacon and probe request on DFS channel,
+* once have selected SSID be found in beacon or probe request,
+* MT7931 will turn to acive scan and send probe request, user can set the dwell
+* time which refer to passive or active scan settings when sending the probe
+* request on DFS channel.
+*
+* @param [IN]scan_option 0: follow active scan dwell time
+*                        1: follow passive scan dwell time
+*
+* @return >0 means success, <0 means fail
+*/
+int32_t wifi_config_set_DFS_dwll_time(uint8_t scan_option);
+#endif
+
 
 /**
 * @brief This function immediately disconnects the current connection from the
@@ -5724,6 +6093,15 @@ int32_t wifi_config_set_tx_rate(uint8_t fixed, uint8_t mode,
 int32_t wifi_config_set_twt(struct wifi_twt_params_t *prTWTInput);
 
 /**
+* @brief Get the current TWT setting
+*
+* @Param [OUT]prTwt = twt parameter
+*
+* @return  >=0 means success, <0 means fail and not TWT section existed
+*/
+int32_t wifi_config_get_twt_param(struct wifi_twt_params_t *prTwt);
+
+/**
 * @brief This function set up the configutations for coalesing
 *        filter for L3 BC.
 *
@@ -5862,6 +6240,41 @@ int32_t raw_packet_handler(uint8_t *payload, unsigned int len);
 int32_t wifi_connection_parse_data_descriptor(uint8_t *payload,
 			struct wifi_data_parse_t *data);
 
+
+#if CFG_SUPPORT_EDCCA_TH_CUSTOMIZED
+/**
+* @brief This function used to set Wifi EDCCA threshold
+*
+* @param[in] band  indicates the Wi-Fi bandwidth that the function will operate
+* on.
+* Value                         |Definition |
+*------------------------------|--------------------------------------------|
+* \b #WIFI_BAND_2_4_G           | 2.4GHz|
+* \b #WIFI_BAND_5_G             | 5GHz|
+*
+* @param[in]  Wifi EDCCA threshold, valid value: -100 ~ -10
+*
+* @return  =0 the operation completed successfully, else the operation failed.
+*/
+int32_t wifi_config_set_EDCCA_threshold(uint8_t band, int8_t threshold);
+
+/**
+* @brief This function used to get Wifi EDCCA threshold
+*
+* @param[in] band  indicates the Wi-Fi bandwidth that the function will operate
+* on.
+* Value                         |Definition |
+*------------------------------|--------------------------------------------|
+* \b #WIFI_BAND_2_4_G           | 2.4GHz|
+* \b #WIFI_BAND_5_G             | 5GHz|
+*
+* @param[OUT]  Return the Wifi EDCCA threshold.
+*
+* @return  =0 the operation completed successfully, else the operation failed.
+*/
+int32_t wifi_config_get_EDCCA_threshold(uint8_t band, int8_t *threshold);
+#endif /* #if CFG_SUPPORT_EDCCA_TH_CUSTOMIZED */
+
 /**
 * @brief This function parses the data descriptor in raw packet.
 *
@@ -5953,15 +6366,17 @@ int wifi_config_set_csi(char *pcCommand, int i4TotalLen);
 *
 * Value                         |Definition |
 * ------------------------------|----------------------------------------------|
-* \b 0                          | force antenna 0|
-* \b 1                          | force antenna 1|
-* \b 2                          | auto selection|
+* \b 0                          | force antenna 0 |
+* \b 1                          | force antenna 1 |
+* \b 2                          | enable diversity |
+* \b 3                          | disable diversity |
 *
 * @return  >=0 the operation completed successfully, <0 the operation failed.
 *
-* @note This function works only when the HW configuration support. For example,
-* @note 1) 7933 RFB with an external SPDT module to control antenna by GPIO40
-* @note 2) And eFuse[0x3DA]=0x01 meaning Wi-Fi diversity with Bluetooth in use
+* @note Value 0~2 works only when the HW configuration support. For example,
+* 1) 7933 RFB with an external SPDT module to control antenna by GPIO40
+* 2) And eFuse[0x3DA]=0x01 meaning Wi-Fi diversity with Bluetooth in use
+* If the HW does not support, please choose value 3 to disable it.
 */
 int32_t wifi_config_set_antdiv_mode(uint8_t mode);
 
@@ -5972,9 +6387,10 @@ int32_t wifi_config_set_antdiv_mode(uint8_t mode);
 *
 * Value                         |Definition |
 * ------------------------------|----------------------------------------------|
-* \b 0                          | force antenna 0|
-* \b 1                          | force antenna 1|
-* \b 2                          | auto selection|
+* \b 0                          | force antenna 0 |
+* \b 1                          | force antenna 1 |
+* \b 2                          | enable diversity |
+* \b 3                          | disable diversity |
 *
 * @return  >=0 the operation completed successfully, <0 the operation failed.
 */
@@ -5993,6 +6409,157 @@ int32_t wifi_config_get_antdiv_mode(uint8_t *mode);
 * @return  >=0 the operation completed successfully, <0 the operation failed.
 */
 int32_t wifi_config_get_antdiv_cur_idx(uint8_t *index);
+#endif
+
+/**
+ * @brief This function set the sta record to disable remove STA.
+ *
+ * @param mac_addr[in] Assign the STA MAC address byte array of size
+ *        WIFI_MAC_ADDRESS_LENGTH for setting disable removing STA.
+ * @param disable[in] indicates disable the STA being removed.
+ *        0: Enable STA being removed when there is no traffic.
+ *        1: Disable STA being removed when there is no traffic.
+ *
+ * @return 0 on success, -1 on error
+ */
+int32_t wifi_config_set_sap_remove_sta_disable(uint8_t *mac_addr,
+				    uint8_t disable);
+
+#if CFG_SUPPORT_TSF_SYNC
+/**
+ * @brief This function get the timestamp value from firmware
+ *        and system time whitch mapped by GPT port_4.
+ *
+ * @param tsf[out] Timestamp value.
+ *
+ * @param sys_time_us[out] system microsecond time form GPT port_4.
+ *
+ * @param os_tick[out] FreeRTOS os tick by xTaskGetTickCountFromISR(void).
+ */
+void get_tsf_and_system_time(unsigned long long *tsf,
+		uint64_t *sys_time_us, TickType_t *os_tick);
+
+/**
+ * @brief This function get the GPT port_4 microsecond time as system time.
+ *
+ * @param sys_time_us[out] system microsecond time form GPT port_4.
+ */
+void get_system_time_us(uint64_t *sys_time_us);
+
+/**
+ * @brief This function implement microsecond delay by GPT port_4.
+ *
+ * @param us[in] time in microsecond.
+ */
+void system_gpt_delay_us(uint64_t us);
+
+/**
+ * @brief This function switch GPT microsecond time to timestamp value.
+ *        Using get_system_time_us() together can reduce the time error of
+ *		  get_tsf_and_system_time() function itself.
+ *
+ *        uint64_t sys_time_us, TSF_value;
+ *		  get_system_time_us(&sys_time_us);
+ *		  TSF_value = switch_sys_us_to_TSF(sys_time_us);
+ *
+ * @param sys_time[in] time in microsecond.
+ *
+ * @return The timestamp value of sys_time[in] mapping.
+ */
+uint64_t switch_sys_us_to_TSF(uint64_t sys_time);
+
+/**
+ * @brief This function create a task loop 2s to call
+ *		  get_tsf_and_system_time() to update the mapping
+ *		  between GPT port 4 and timestamp value from firmware.
+ */
+void system_time_tsf_sync_task_init(void);
+
+#endif
+
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+/**
+ * @brief This function is used to start P2P find.
+ *
+ * @param freq[in] The frequency of the channel to start the P2P find operation.
+ *                 If set to 0, do full channel scan.
+ *
+ * @param timeout_sec[in] The timeout in seconds for the P2P find operation.
+ *                        If set to 0, find operation will not be canceled.
+ *
+ * @param seek_mac[in] The target GO mac address. If unknown, set to NULL.
+ *
+ * @param find_type[in] The type of P2P find operation.
+ * Value                         |Definition |
+ * ------------------------------|-------------------------------|
+ * \b 0                          | P2P_FIND_START_WITH_FULL|
+ * \b 1                          | P2P_FIND_ONLY_SOCIAL|
+ * \b 2                          | P2P_FIND_PROGRESSIVE|
+ *
+ * @param search_delay_ms[in] How many milliseconds later will start
+ *               find operation. If set to 0, it will start immediately.
+ */
+int32_t wifi_connection_p2p_find(int freq, int timeout_sec, char *seek_mac,
+		int find_type, int search_delay_ms);
+
+/**
+ * @brief This function is used to stop P2P find.
+ */
+int32_t wifi_connection_p2p_stop_find(void);
+
+/**
+ * @brief This function is used to set SD request.
+ *
+ * @param reply[out] The reply id buff of SD request.
+ *
+ * @param reply_len[in] The length of reply buff.
+ *
+ * @param sd_mac[in] The target GO mac address for SD request.
+ *If unknown, set 00, it will send SD request to any GO.
+ *
+ * @param req_buff[in] The IE buffer of SD request.
+ */
+int32_t wifi_connection_p2p_set_sd_req(char *reply, int reply_len,
+		char *sd_mac, char *req_buff);
+
+/**
+ * @brief This function is used to stop P2P find.
+ *
+ * @param req_id[in] The reply id buff get from wifi_connection_p2p_set_sd_req;
+ */
+int32_t wifi_connection_p2p_cancel_sd_req(const char *req_id);
+
+/**
+ * @brief This function is used to flush p2p state machine.
+ */
+int32_t wifi_connection_p2p_flush(void);
+
+/**
+ * @brief This function is used to cancel p2p connect.
+ */
+int32_t wifi_connection_p2p_cancel_connect(void);
+
+/**
+ * @brief This function is used to start p2p connect.
+ *
+ * @param go_mac[int] The GO mac address.
+ *
+ * @param go_pin[in] The pin code for the GO.
+ *
+ * @param go_freq[in] The frequency for the GO.
+ */
+uint8_t wifi_connection_p2p_connect(const char *go_mac, const char *go_pin,
+		uint32_t go_freq);
+
+/**
+ * @brief This function is used to remove p2p group.
+ */
+int32_t wifi_connection_p2p_group_remove(void);
+
+/**
+ * @brief This function is used to select p2p network.
+ */
+int32_t wifi_connection_p2p_select_network(void);
 #endif
 
 #ifdef __cplusplus

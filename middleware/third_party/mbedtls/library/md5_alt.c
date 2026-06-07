@@ -96,9 +96,9 @@ int mbedtls_md5_starts_ret( mbedtls_md5_context *ctx )
 }
 
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
-void mbedtls_md5_starts( mbedtls_md5_context *ctx )
+int mbedtls_md5_starts( mbedtls_md5_context *ctx )
 {
-    mbedtls_md5_starts_ret( ctx );
+    return mbedtls_md5_starts_ret( ctx );
 }
 #endif
 
@@ -129,11 +129,11 @@ int mbedtls_md5_update_ret( mbedtls_md5_context *ctx,
 }
 
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
-void mbedtls_md5_update( mbedtls_md5_context *ctx,
+int mbedtls_md5_update( mbedtls_md5_context *ctx,
                          const unsigned char *input,
                          size_t ilen )
 {
-    mbedtls_md5_update_ret( ctx, input, ilen );
+    return mbedtls_md5_update_ret( ctx, input, ilen );
 }
 #endif
 
@@ -163,10 +163,10 @@ int mbedtls_md5_finish_ret( mbedtls_md5_context *ctx,
 }
 
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
-void mbedtls_md5_finish( mbedtls_md5_context *ctx,
+int mbedtls_md5_finish( mbedtls_md5_context *ctx,
                          unsigned char output[16] )
 {
-    mbedtls_md5_finish_ret( ctx, output );
+    return mbedtls_md5_finish_ret( ctx, output );
 }
 #endif
 

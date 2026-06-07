@@ -490,6 +490,7 @@ int32_t audio_ipi_dsp_stop(void);
 int32_t audio_ipi_dsp_suspend(void);
 int32_t audio_ipi_dsp_resume(void);
 uint16_t _copy_shared(void *buffer, uint32_t data_size);
+uint8_t audio_drv_get_spk_output(void);
 
 #ifdef CFG_AUDIO_DSP_LEAUDIO_EN
 int32_t le_audio_ipi_dsp_open(stream_params_t *stream_param);

@@ -87,6 +87,7 @@
 *                              C O N S T A N T S
 ********************************************************************************
 */
+#define SCN_DONE_TIMEOUT_SEC            25
 /* code without supplicant */
 #define ETH_ALEN	6		/* Octets in one ethernet addr	 */
 #define ETH_HLEN	14		/* Total octets in header.	 */
@@ -360,6 +361,14 @@ int mtk_freertos_wpa_remove_pmkid(void *priv, const u8 *bssid, const u8 *pmkid);
 
 int mtk_freertos_wpa_flush_pmkid(void *priv);
 
+#ifdef __MTK_MT7933_P2P_SUPPORT__
+int mtk_freertos_wap_remain_on_channel(void *priv, unsigned int freq,
+					unsigned int duration);
+
+int mtk_freertos_wap_cancel_remain_on_channel(void *priv);
+
+
+#endif
 #if !CFG_SUPPORT_NO_SUPPLICANT_OPS_P2P /*For mini supplicant*/
 
 int mtk_p2p_freertos_wpa_get_channel_list(

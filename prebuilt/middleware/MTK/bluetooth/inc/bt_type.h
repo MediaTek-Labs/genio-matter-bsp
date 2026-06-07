@@ -213,6 +213,7 @@ typedef uint8_t const *bt_bd_addr_ptr_t;        /**< A pointer to the #bt_bd_add
 #define BT_ADDR_RANDOM          0x01 /**< Random address type. */
 #define BT_ADDR_PUBLIC_IDENTITY 0x02 /**< Public identity address type. */
 #define BT_ADDR_RANDOM_IDENTITY 0x03 /**< Random identity address type. */
+#define BT_ADDR_LE_PUBLIC       0x04 /**< Fixed Public address type for LE ADV. */
 typedef uint8_t bt_addr_type_t;      /**< Define the address type. */
 
 #define BT_NULL     0   /**< NULL */

@@ -33,7 +33,7 @@
 
 #if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
 #include <string.h>
-#include "mbedtls/entropy_poll.h"
+#include "entropy_poll.h"
 #ifndef MTK_TFM_ENABLE
 #include "hal_trng.h"
 #else

@@ -112,9 +112,9 @@ BT_EXTERN_C_BEGIN
 /* -------------- The buffer size of a single control block. --------------------- */
 #define BT_CONTROL_BLOCK_SIZE_OF_TIMER            (24)     /**< The size of a control block for Timer. */
 //#ifndef __BT_GATTS_EH__ /* MTK_COMMON default support GATTS_EN, so we need +4 bytes size for bt_att_t struct, which is included by bt_connect_t */
-//#define BT_CONTROL_BLOCK_SIZE_OF_LE_CONNECTION    (108)    /**< The size of a control block for Bluetooth LE connection. */
+//#define BT_CONTROL_BLOCK_SIZE_OF_LE_CONNECTION    (120)    /**< The size of a control block for Bluetooth LE connection. */
 //#else
-#define BT_CONTROL_BLOCK_SIZE_OF_LE_CONNECTION    (108 + 4)    /**< The size of a control block for Bluetooth LE connection. */
+#define BT_CONTROL_BLOCK_SIZE_OF_LE_CONNECTION    (120 + 4)    /**< The size of a control block for Bluetooth LE connection. */
 //#endif
 #define BT_CONTROL_BLOCK_SIZE_OF_EDR_CONNECTION   (112)     /**< The size of a control block for BR/EDR connection. */
 #define BT_CONTROL_BLOCK_SIZE_OF_RFCOMM           (52)     /**< The size of a control block for RFCOMM. */

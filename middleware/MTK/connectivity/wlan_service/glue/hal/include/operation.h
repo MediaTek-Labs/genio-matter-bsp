@@ -47,6 +47,7 @@ enum op_wlan_oid {
 	OP_WLAN_OID_GET_TEST_ICAP_MAX_DATA_LEN = 14,
 	OP_WLAN_OID_GET_TEST_ICAP_DATA = 15,
 	OP_WLAN_OID_RESET_RECAL_COUNT = 16,
+	OP_WLAN_OID_LIST_MODE = 18,
 	OP_WLAN_OID_NUM
 };
 
@@ -527,6 +528,13 @@ s_int32 mt_op_get_wf_path_comb(
 	u_int8 *path_len);
 
 s_int32 mt_op_set_test_mode_dnlk_clean(struct test_wlan_info *winfos);
+
+s_int32 mt_op_listmode_cmd(
+	struct test_wlan_info *winfos,
+	u_int8 *para,
+	u_int16 para_len,
+	u_int32 *rsp_len,
+	void *rsp_data);
 
 #ifdef TXBF_SUPPORT
 s_int32 mt_op_set_ibf_phase_cal_e2p_update(

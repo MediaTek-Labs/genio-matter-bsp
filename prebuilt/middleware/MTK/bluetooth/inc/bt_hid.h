@@ -658,6 +658,7 @@ typedef uint8_t bt_hid_protocol_mode_t;
 #define BT_HID_GET_REPORT_IND  (BT_MODULE_HID|0x05)  /**< A #BT_HID_GET_REPORT_IND request is recevied from the Host. */
 #define BT_HID_SET_REPORT_IND  (BT_MODULE_HID|0x06)  /**< A SET_REPORT request is received from HID.  */
 #define BT_HID_CONTROL_IND    (BT_MODULE_HID|0x07) /**< A HID_CONTROL request is received from HID.  */
+#define BT_HID_RHO_DONE_IND   (BT_MODULE_HID|0x08) /**< An event indecates that RHO process is finished. */
 /**
  * @}
  */

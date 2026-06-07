@@ -62,19 +62,22 @@ endif
 C_FILES += \
 $(MBEDTLS_SRC)/library/aes.c \
 $(MBEDTLS_SRC)/library/aesni.c \
-$(MBEDTLS_SRC)/library/arc4.c \
+$(MBEDTLS_SRC)/library/aesce.c \
 $(MBEDTLS_SRC)/library/asn1parse.c \
 $(MBEDTLS_SRC)/library/asn1write.c \
 $(MBEDTLS_SRC)/library/base64.c \
 $(MBEDTLS_SRC)/library/bignum.c \
-$(MBEDTLS_SRC)/library/blowfish.c \
+$(MBEDTLS_SRC)/library/bignum_core.c \
+$(MBEDTLS_SRC)/library/bignum_mod.c \
+$(MBEDTLS_SRC)/library/bignum_mod_raw.c \
 $(MBEDTLS_SRC)/library/camellia.c \
 $(MBEDTLS_SRC)/library/ccm.c \
-$(MBEDTLS_SRC)/library/certs.c \
 $(MBEDTLS_SRC)/library/chacha20.c \
 $(MBEDTLS_SRC)/library/chachapoly.c \
 $(MBEDTLS_SRC)/library/cipher.c \
 $(MBEDTLS_SRC)/library/cipher_wrap.c \
+$(MBEDTLS_SRC)/library/cmac.c \
+$(MBEDTLS_SRC)/library/constant_time.c \
 $(MBEDTLS_SRC)/library/ctr_drbg.c \
 $(MBEDTLS_SRC)/library/debug.c \
 $(MBEDTLS_SRC)/library/des.c \
@@ -83,16 +86,16 @@ $(MBEDTLS_SRC)/library/ecdh.c \
 $(MBEDTLS_SRC)/library/ecdsa.c \
 $(MBEDTLS_SRC)/library/ecp.c \
 $(MBEDTLS_SRC)/library/ecp_curves.c \
+$(MBEDTLS_SRC)/library/ecp_curves_new.c \
 $(MBEDTLS_SRC)/library/entropy.c \
 $(MBEDTLS_SRC)/library/entropy_poll.c \
 $(MBEDTLS_SRC)/library/entropy_hardware_poll.c \
 $(MBEDTLS_SRC)/library/error.c \
 $(MBEDTLS_SRC)/library/gcm.c \
-$(MBEDTLS_SRC)/library/havege.c \
 $(MBEDTLS_SRC)/library/hkdf.c \
 $(MBEDTLS_SRC)/library/hmac_drbg.c \
-$(MBEDTLS_SRC)/library/md2.c \
-$(MBEDTLS_SRC)/library/md4.c \
+$(MBEDTLS_SRC)/library/lmots.c \
+$(MBEDTLS_SRC)/library/lms.c \
 $(MBEDTLS_SRC)/library/md5.c \
 $(MBEDTLS_SRC)/library/md.c \
 $(MBEDTLS_SRC)/library/memory_buffer_alloc.c \
@@ -101,7 +104,6 @@ $(MBEDTLS_SRC)/library/oid.c \
 $(MBEDTLS_SRC)/library/padlock.c \
 $(MBEDTLS_SRC)/library/pem.c \
 $(MBEDTLS_SRC)/library/pk.c \
-$(MBEDTLS_SRC)/library/pkcs11.c \
 $(MBEDTLS_SRC)/library/pkcs12.c \
 $(MBEDTLS_SRC)/library/pkcs5.c \
 $(MBEDTLS_SRC)/library/pkparse.c \
@@ -109,23 +111,48 @@ $(MBEDTLS_SRC)/library/pk_wrap.c \
 $(MBEDTLS_SRC)/library/pkwrite.c \
 $(MBEDTLS_SRC)/library/platform.c \
 $(MBEDTLS_SRC)/library/platform_util.c \
-$(MBEDTLS_SRC)/library/poly1305.c \
+$(MBEDTLS_SRC)/library/poly1305.c 
+ifeq ($(MTK_TFM_ENABLE),n)
+C_FILES += \
 $(MBEDTLS_SRC)/library/psa_crypto.c \
+$(MBEDTLS_SRC)/library/psa_crypto_aead.c \
+$(MBEDTLS_SRC)/library/psa_crypto_cipher.c \
+$(MBEDTLS_SRC)/library/psa_crypto_client.c \
+$(MBEDTLS_SRC)/library/psa_crypto_driver_wrappers_no_static.c \
+$(MBEDTLS_SRC)/library/psa_crypto_ecp.c \
+$(MBEDTLS_SRC)/library/psa_crypto_ffdh.c \
+$(MBEDTLS_SRC)/library/psa_crypto_hash.c \
+$(MBEDTLS_SRC)/library/psa_crypto_mac.c \
+$(MBEDTLS_SRC)/library/psa_crypto_pake.c \
+$(MBEDTLS_SRC)/library/psa_crypto_rsa.c \
 $(MBEDTLS_SRC)/library/psa_crypto_se.c \
 $(MBEDTLS_SRC)/library/psa_crypto_slot_management.c \
 $(MBEDTLS_SRC)/library/psa_crypto_storage.c \
 $(MBEDTLS_SRC)/library/psa_its_file.c \
+$(MBEDTLS_SRC)/library/psa_util.c 
+endif
+C_FILES += \
 $(MBEDTLS_SRC)/library/ripemd160.c \
 $(MBEDTLS_SRC)/library/rsa.c \
+$(MBEDTLS_SRC)/library/rsa_alt_helpers.c \
 $(MBEDTLS_SRC)/library/sha1.c \
 $(MBEDTLS_SRC)/library/sha256.c \
 $(MBEDTLS_SRC)/library/sha512.c \
+$(MBEDTLS_SRC)/library/sha3.c \
 $(MBEDTLS_SRC)/library/ssl_cache.c \
 $(MBEDTLS_SRC)/library/ssl_ciphersuites.c \
-$(MBEDTLS_SRC)/library/ssl_cli.c \
+$(MBEDTLS_SRC)/library/ssl_client.c \
+$(MBEDTLS_SRC)/library/ssl_cookie.c \
+$(MBEDTLS_SRC)/library/ssl_debug_helpers_generated.c \
 $(MBEDTLS_SRC)/library/ssl_msg.c \
-$(MBEDTLS_SRC)/library/ssl_srv.c \
+$(MBEDTLS_SRC)/library/ssl_ticket.c \
 $(MBEDTLS_SRC)/library/ssl_tls.c \
+$(MBEDTLS_SRC)/library/ssl_tls12_client.c \
+$(MBEDTLS_SRC)/library/ssl_tls12_server.c \
+$(MBEDTLS_SRC)/library/ssl_tls13_client.c \
+$(MBEDTLS_SRC)/library/ssl_tls13_generic.c \
+$(MBEDTLS_SRC)/library/ssl_tls13_server.c \
+$(MBEDTLS_SRC)/library/ssl_tls13_keys.c \
 $(MBEDTLS_SRC)/library/threading.c \
 $(MBEDTLS_SRC)/library/threading_alt.c \
 $(MBEDTLS_SRC)/library/timing.c \
@@ -138,9 +165,6 @@ $(MBEDTLS_SRC)/library/x509_crt.c \
 $(MBEDTLS_SRC)/library/x509_csr.c \
 $(MBEDTLS_SRC)/library/x509write_crt.c \
 $(MBEDTLS_SRC)/library/x509write_csr.c \
-$(MBEDTLS_SRC)/library/xtea.c \
-$(MBEDTLS_SRC)/library/ssl_cookie.c \
-$(MBEDTLS_SRC)/library/ssl_ticket.c \
 $(MBEDTLS_SRC)/library/cmac.c \
 $(MBEDTLS_SRC)/library/ecjpake.c \
 $(MBEDTLS_SRC)/library/net_sockets.c \
@@ -150,7 +174,8 @@ $(MBEDTLS_SRC)/library/md5_alt.c \
 $(MBEDTLS_SRC)/library/sha1_alt.c \
 $(MBEDTLS_SRC)/library/sha256_alt.c \
 $(MBEDTLS_SRC)/library/sha512_alt.c \
-$(MBEDTLS_SRC)/library/rsa_internal.c \
+$(MBEDTLS_SRC)/library/pk_ecc.c \
+$(MBEDTLS_SRC)/library/block_cipher.c \
 
 #################################################################################
 #include path
@@ -163,6 +188,9 @@ CFLAGS  += -I./src/mbedtls/include
 CFLAGS	+= -I$(SOURCE_DIR)/middleware/third_party/lwip/src/include
 CFLAGS  += -I$(SOURCE_DIR)/middleware/third_party/lwip/ports/include
 CFLAGS  += -I$(SOURCE_DIR)/middleware/third_party/mbedtls/include
+ifeq ($(MTK_TFM_ENABLE),n)
+CFLAGS  += -I$(SOURCE_DIR)/middleware/third_party/mbedtls/include/psa
+endif
 CFLAGS  += -I$(SOURCE_DIR)/middleware/third_party/mbedtls/configs
 CFLAGS  += -I$(SOURCE_DIR)/kernel/rtos/FreeRTOS/Source/include 
 CFLAGS  += -I$(SOURCE_DIR)/kernel/rtos/FreeRTOS/Source/portable/GCC/ARM_CM4F

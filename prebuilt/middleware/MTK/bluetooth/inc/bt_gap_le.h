@@ -324,13 +324,29 @@ typedef uint8_t bt_gap_le_smp_pairing_method_t;    /**< The final pairing method
 #define BT_GAP_LE_CONFIG_PERIODIC_ADVERTISING_CNF  (BT_MODULE_GAP | 0x0037)    /**< Config periodic advertising confirmation with #bt_gap_le_config_periodic_advertising_cnf_t. */
 #define BT_GAP_LE_RPA_ROTAION_IND                  (BT_MODULE_GAP | 0x0038)    /**< RPA rotaion with #bt_gap_le_rpa_rotation_ind_t. */
 #define BT_GAP_LE_HANDLE_UPDATE                    (BT_MODULE_GAP | 0x0039)    /**< After RHO done the hci handle will be updated with #bt_gap_le_handle_update_t */
+#define BT_GAP_LE_READ_LOCAL_FEATURES_CNF          (BT_MODULE_GAP | 0x003A)    /**< This event indicates the confirmation of BT_HCI_CMD_LE_READ_LOCAL_SUPPORTED_FEATURES */
+
+#ifdef __MTK_APCF_ENABLE__
+#define BT_GAP_LE_APCF_ENABLE_CNF                    (BT_MODULE_GAP | 0x0040)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_SET_FILTERING_PARAM_CNF       (BT_MODULE_GAP | 0x0041)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_BROADCAST_ADDRESS_CNF         (BT_MODULE_GAP | 0x0042)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_SERVICE_UUID_CNF              (BT_MODULE_GAP | 0x0043)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_SERVICE_SOLICITATION_UUID_CNF (BT_MODULE_GAP | 0x0044)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_LOCAL_NAME_CNF                (BT_MODULE_GAP | 0x0045)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_MANUFACTURER_DATA_CNF         (BT_MODULE_GAP | 0x0046)    /**< This event indicates APCF defined by Google */
+#define BT_GAP_LE_APCF_SERVICE_DATA_CNF              (BT_MODULE_GAP | 0x0047)    /**< This event indicates APCF defined by Google */
+#endif // __MTK_APCF_ENABLE__
 
 #define BT_GAP_LE_SET_PRIVACY_MODE_CNF             (BT_MODULE_GAP | 0x0060)    /**< Set privacy mode confirmation with NULL payload. */
+
+#define BT_GAP_LE_SET_PUBLIC_ADDRESS_CNF           (BT_MODULE_GAP | 0x0061)    /**< Set Public address for LE. */
 
 #ifdef __MTK_MULTI_ADV__
 #define BT_GAP_LE_SETPARA_MULTIPLE_ADVERTISING_CNF (BT_MODULE_GAP | 0x0080)    /**< The confirmation event of setting parameter for a multi-advertising instance. */
 #define BT_GAP_LE_SETDATA_MULTIPLE_ADVERTISING_CNF (BT_MODULE_GAP | 0x0081)    /**< The confirmation event of setting data for a multi-advertising instance. */
 #define BT_GAP_LE_SCANDATA_MULTIPLE_ADVERTISING_CNF (BT_MODULE_GAP | 0x0082)    /**< The confirmation event of setting scan response data for a multi-advertising instance. */
+#endif
+#if defined(__MTK_APCF_ENABLE__) || defined(__MTK_MULTI_ADV__)
 #define BT_GAP_LE_READ_VENDOR_CAPABILITIES_CNF     (BT_MODULE_GAP | 0x0083)    /**< This event indicates the vendor capabilities defined by Google */
 #endif
 
@@ -405,6 +421,10 @@ typedef uint16_t bt_gap_le_ext_adv_report_evt_mask_t;   /**< The type of extende
 #define BT_GAP_LE_AD_TYPE_32_BIT_SOLICITATION_UUID 0x1F /**< List of 32-bit service solicitation UUIDs. */
 #define BT_GAP_LE_AD_TYPE_32_BIT_UUID_DATA         0x20 /**< Service data - 32-bit UUID. */
 #define BT_GAP_LE_AD_TYPE_128_BIT_UUID_DATA        0x21 /**< Service data - 128-bit UUID. */
+#define BT_GAP_LE_AD_TYPE_BIGINFO                  0x2C /**< BIG Info. */
+#define BT_GAP_LE_AD_TYPE_BROADCAST_CODE           0x2D /**< Broadcast Code. */
+#define BT_GAP_LE_AD_TYPE_RSI                      0x2E /**< Resolvable Set Identifier. */
+#define BT_GAP_LE_AD_TYPE_BROADCAST_NAME           0x30 /**< Broadcast Name. */
 #define BT_GAP_LE_AD_TYPE_MANUFACTURER_SPECIFIC    0xFF /**< Manufacturer specific data. */
 
 #define BT_GAP_LE_AD_FLAG_LIMITED_DISCOVERABLE     (0x01 << 0) /**< LE limited discoverable mode. */
@@ -442,6 +462,13 @@ typedef uint32_t bt_gap_le_set_resolving_list_op_t;             /**< Operation t
 typedef uint8_t bt_gap_le_advertising_handle_t;             /**< The type of advertising handle. */
 
 /**
+*  @brief The type of LE remote features.
+*/
+#define  BT_GAP_LE_CONNECTION_UPDATE  0x01                      /**< Connection Parameters Request procedure. */
+#define  BT_GAP_LE_ULL2_0             0x02                      /**< ULL2.0. */
+typedef uint8_t bt_gap_le_remote_feature_t;                 /**< The type of remote feature. */
+
+/**
  * @brief LE security modes.
  */
 #define BT_GAP_LE_SECURITY_MODE1_1 (BT_GAP_LE_SECURITY_UNAUTH_MASK)    /**< Mode 1 level 1, no security. */
@@ -459,6 +486,25 @@ typedef uint8_t bt_gap_le_advertising_handle_t;             /**< The type of adv
  * @defgroup Bluetoothhbif_gap_struct Struct
  * @{
  */
+
+/**
+ *  @brief Confirmation on the maximum advertising instances received.
+ */
+BT_PACKED(
+typedef struct {
+    bt_hci_status_t  status;                         /**< Status. */
+    uint8_t          max_advertising_instances;      /**< The maximum number of advertising instances supported by the controller. */
+    uint8_t          rpa_offloading;                 /* 0: Not capable, 1: Capable */
+    uint16_t         total_scan_results_strg;
+    uint8_t          max_irk_list_sz;
+    uint8_t          filter_support;
+    uint8_t          max_filter;
+    uint8_t          energy_support;
+    uint16_t         version_supported;
+    uint16_t         total_trackable_advertisers;
+    uint8_t          extended_scan_support;
+    uint8_t          debug_logging_supported;
+}) bt_gap_le_get_max_advertising_instances_cnf_t;
 
 /**
  * @brief For more information about the pairing configuration, please refer to the <a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439&_ga=1.241778370.1195131350.1437993589">Bluetooth core specification version 4.2 [Vol 3, Part H] Section 3.5.1</a>.
@@ -1341,6 +1387,18 @@ bt_status_t bt_gap_le_periodic_advertising_create_sync(const bt_hci_cmd_le_perio
 
 bt_status_t bt_gap_le_periodic_advertising_create_sync_cancel(void);
 
+
+/**
+ * @brief     This function is used to terminate the periodic advertising train from an advertiser and begin receiving periodic advertising packets.
+ *            The application receives the event #BT_GAP_LE_PERIODIC_ADVERTISING_TERMINATE_SYNC_CNF event after the command is complete.
+ * @param[in] sync_handle     is the periodic advertising sync handle.
+ * @return    #BT_STATUS_SUCCESS, the operation completed successfully, otherwise it failed.
+ *            #BT_STATUS_UNSUPPORTED, the operation is not supported in this version.
+ *            #BT_STATUS_FAIL, an identical operation is executing or the parameter is invalid, please retry after the event #BT_GAP_LE_PERIODIC_ADVERTISING_CREATE_SYNC_CNF has been received, or make sure the parameter is valid.
+ *            #BT_STATUS_OUT_OF_MEMORY, out of memory.
+ */
+bt_status_t bt_gap_le_periodic_advertising_terminate_sync(bt_handle_t sync_handle);
+
 /**
  * @brief     This is a user-defined API that gets the pairing temp key or ra.
  * @param[in] connection_handle   is the connection handle.
@@ -1349,15 +1407,62 @@ bt_status_t bt_gap_le_periodic_advertising_create_sync_cancel(void);
  */
 bt_status_t bt_gap_le_get_temp_key(bt_handle_t connection_handle, bt_gap_le_temp_key_t *tk_info);
 
-//__MTK_COMMON__
 /**
- * @brief     This function is used to stop reception of the periodic advertising train identified by the Sync_Handle parameter.
- * @param[in] sync_handle    identify the periodic advertising train
- * @return    #BT_STATUS_SUCCESS, terminate successfully
- *            #BT_STATUS_UNSUPPORTED, the operation not supported on this version.
- *            #BT_STATUS_FAIL, the opeation is excuting failed or the parameters are invalid
+ * @brief     This function is used to check whether the remote features are supported.
+ * @param[in] conn_handle   is the connection handle.
+ * @param[in] feature       is the remote feature.
+ * @return    true,        This feature is supported in the remote device.
+ *            false,       This feature is not supported in the remote device.
  */
-bt_status_t bt_gap_le_periodic_advertising_terminate_sync(bt_handle_t sync_handle);
+bool bt_gap_le_check_remote_features(uint16_t conn_handle, bt_gap_le_remote_feature_t feature);
+
+#ifdef __MTK_APCF_ENABLE__
+/**
+ * @brief     This function is called to setup the adv data payload filter param
+ * @param[in] param       filtering parameter
+ * @return    #BT_STATUS_SUCCESS, the operation completed successfully, otherwise it failed.
+ */
+bt_status_t bt_gap_le_apcf_set_filtering_param(const bt_hci_cmd_le_set_filtering_parameters_t *param);
+
+/**
+ * @brief     This function is called to clear some filter index rules.
+ * @param[in] client_if   client interface identifier.
+ * @param[in] filt_index  indicates which filter rules are to be deleted.
+ * @return    #BT_STATUS_SUCCESS, the operation completed successfully, otherwise it failed.
+ */
+bt_status_t bt_gap_le_apcf_filtering_clear(int client_if, int filt_index);
+
+/**
+ * @brief     This function is called to enable/disable APCF.
+ * @param[in] client_if   client interface identifier.
+ * @param[in] enable      enable or disable APCF feature
+ * @return    #BT_STATUS_SUCCESS, the operation completed successfully, otherwise it failed.
+ */
+bt_status_t bt_gap_le_apcf_filtering_enable(int client_if, bool enable);
+
+/**
+ * @brief     This function sends LE_APCF_Command: Enable_sub_cmd
+ * @param[in] client_if        client interface identifier.
+ * @param[in] action           add, delete or clear
+ * @param[in] filt_type        support sub OCF: 0x02 ~ 0x07
+ * @param[in] filt_index       indicates which filter rules are to be deleted.
+ * @param[in] company_id       company id
+ * @param[in] company_id_mask  mask
+ * @param[in] p_uuid           service uuid or solicitation uuid. 2, 4, 16 bytes.
+ * @param[in] p_uuid_mask      mask
+ * @param[in] bd_addr          broadcast address
+ * @param[in] addr_type        0x00: public, 0x01: random
+ * @param[in] data_len         length of p_data
+ * @param[in] p_data           data pointer
+ * @param[in] mask_len         length of p_mask
+ * @param[in] p_mask           mask pointer
+ * @return    #BT_STATUS_SUCCESS, the operation completed successfully, otherwise it failed.
+ */
+bt_status_t bt_gap_le_apcf_scan_filter_addremove(uint8_t client_if, uint32_t action, uint32_t filt_type,
+                uint32_t filt_index, uint32_t company_id, uint32_t company_id_mask, const bt_uuid_t * p_uuid,
+                const bt_uuid_t * p_uuid_mask, const bt_bd_addr_t * bd_addr, uint8_t addr_type,
+                uint32_t data_len, uint8_t * p_data, uint32_t mask_len, uint8_t * p_mask);
+#endif // __MTK_APCF_ENABLE__
 
 BT_EXTERN_C_END
 

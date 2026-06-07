@@ -43,62 +43,33 @@
 #endif /* #ifndef UNUSED */
 
 void btif_set_log_lvl(unsigned char lvl, int dump_buffer, int times);
-unsigned char btif_get_log_lvl(void);
 
-#ifndef MTK_BT_MEM_SHRINK
-#define BTIF_LOG_V(fmt, args...)                                   \
-	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_V) {                \
-			LOG_I(BTIF, fmt, ##args);                              \
-		}                                                          \
-	} while (0)
-
-#define BTIF_LOG_D(fmt, args...)                                   \
-	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_D) {                \
-			LOG_I(BTIF, fmt, ##args);                              \
-		}                                                          \
-	} while (0)
+extern void btif_log(unsigned char lvl, const char *fmt, ...);
+#ifdef MTK_BT_MEM_SHRINK
+#define BTIF_LOG_V(fmt, args...)
+#define BTIF_LOG_D(fmt, args...)
 #else
-#define BTIF_LOG_V(...) do {} while(0)
-#define BTIF_LOG_D(...) do {} while(0)
+#define BTIF_LOG_V(fmt, args...) btif_log(BTIF_LOG_LVL_V, fmt, ##args)
+#define BTIF_LOG_D(fmt, args...) btif_log(BTIF_LOG_LVL_D, fmt, ##args)
 #endif
-#define BTIF_LOG_I(fmt, args...)                                   \
-	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_I) {                \
-			LOG_I(BTIF, fmt, ##args);                              \
-		}                                                          \
-	} while (0)
 
-#define BTIF_LOG_W(fmt, args...)                                   \
-	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_W) {                \
-			LOG_W(BTIF, fmt, ##args);                              \
-		}                                                          \
-	} while (0)
-
-#define BTIF_LOG_E(fmt, args...)                                   \
-	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_E) {                \
-			LOG_E(BTIF, fmt, ##args);                              \
-		}                                                          \
-	} while (0)
+#define BTIF_LOG_I(fmt, args...) btif_log(BTIF_LOG_LVL_I, fmt, ##args)
+#define BTIF_LOG_W(fmt, args...) btif_log(BTIF_LOG_LVL_W, fmt, ##args)
+#define BTIF_LOG_E(fmt, args...) btif_log(BTIF_LOG_LVL_E, fmt, ##args)
 
 #define BTIF_LOG_FUNC()                                            \
 	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_D) {                \
-			LOG_I(BTIF, "[F]%s() L %d", __func__, __LINE__);       \
-		}                                                          \
+		BTIF_LOG_D("[F]%s() L %d", __func__, __LINE__);            \
 	} while (0)
 
 #define BTIF_LOG_I_RAW(p, l, fmt, ...)                             \
 	do {                                                           \
-		if (btif_get_log_lvl() >= BTIF_LOG_LVL_I) {                \
+		{                                                          \
 			int raw_count = 0;                                     \
 			const unsigned char *ptr = p;                          \
-			LOG_I(BTIF, fmt, ##__VA_ARGS__);                       \
+			BTIF_LOG_I(fmt, ##__VA_ARGS__);                        \
 			for (raw_count = 0; raw_count < l; ++raw_count) {      \
-				LOG_I(BTIF, " %02X", ptr[raw_count]);	           \
+				BTIF_LOG_I(" %02X", ptr[raw_count]);	           \
 			}                                                      \
 		}                                                          \
 	} while (0)
@@ -123,7 +94,7 @@ void btif_util_task_delay_ms(unsigned int ms);
 void btif_util_task_delay_ticks(unsigned int ticks);
 void *btif_util_malloc(unsigned int size);
 void btif_util_free(void *ptr);
-void btif_util_dump_buffer(char *label, const unsigned char *buf,
+void btif_util_dump_buffer(const char *label, const unsigned char *buf,
 						   unsigned int length, unsigned char force_print);
 
 #endif /*__BTIF_COMMON_H_*/

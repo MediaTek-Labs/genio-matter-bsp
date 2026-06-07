@@ -248,13 +248,8 @@ enum own_type_place_t {
 #define BT_CFG_ITEM_VAL_SIZE  200
 #define BT_CFG_ITEM_TOTAL     10
 #define BT_PWR_ITEM_NAME_SIZE 4
-#define BT_PWR_PARAM_CNT      6
-#define BT_PWR_ITEM_VAL_SIZE  38
+#define BT_PWR_ITEM_VAL_SIZE  20 // max usage: 4bytes*4params, others are reserved
 #define BT_PWR_ITEM_TOTAL     10
-
-/* tx power cmd len and event len */
-#define TX_POWER_CMD_LEN 16
-#define TX_POWER_EVT_LEN 7
 
 /*Low Power Command*/
 #define LOW_POWER_COMMAND_LEN 11
@@ -263,24 +258,13 @@ enum own_type_place_t {
 /* country code length */
 #define COUNTRY_CODE_LEN 2
 
-/* BR/EDR and LE power min and max value */
-#define EDR_MIN        -32
-#define EDR_MAX        17
-#define EDR_MIN_LV9    12
-#define BLE_MIN        -29
-#define BLE_MAX        20
-#define EDR_MIN_R1     -64
-#define EDR_MAX_R1     34
-#define EDR_MIN_LV9_R1 24
-#define BLE_MIN_R1     -58
-#define BLE_MAX_R1     40
-#define EDR_MIN_R2     -128
-#define EDR_MAX_R2     68
-#define EDR_MIN_LV9_R2 48
-#define BLE_MIN_R2     -116
-#define BLE_MAX_R2     80
+#define EDR_PWR_MIN -29
+#define EDR_PWR_MAX 20
+#define EDR_MIN_LV9 12
+#define BLE_PWR_MIN -29
+#define BLE_PWR_MAX 20
 
-#define ERR_PWR -9999
+#define BT_ERR_PWR -9999
 
 #ifdef MTK_BT_DRV_CHIP_RESET
 /* chip reset type */
@@ -298,31 +282,12 @@ enum chip_reset_state_t {
 };
 #endif /* #ifdef MTK_BT_DRV_CHIP_RESET */
 
-/* sku param enum */
-enum {
-	RES_1 = 0,
-	RES_DOT_5,
-	RES_DOT_25
-};
-
 enum {
 	CHECK_SINGLE_SKU_PWR_MODE = 0,
 	CHECK_SINGLE_SKU_EDR_MAX,
 	CHECK_SINGLE_SKU_BLE,
-	CHECK_SINGLE_SKU_BLE_2M,
-	CHECK_SINGLE_SKU_BLE_LR_S2,
-	CHECK_SINGLE_SKU_BLE_LR_S8,
 	CHECK_SINGLE_SKU_ALL };
 
-enum {
-	DISABLE_LV9 = 0,
-	ENABLE_LV9
-};
-
-enum {
-	DIFF_MODE_3DB = 0,
-	DIFF_MODE_0DB
-};
 
 enum bt_fw_coredump_state_t {
 	BT_FW_COREDUMP_UNKNOWN,
@@ -383,11 +348,7 @@ struct bt_power_setting {
 	int8_t edr_max;
 	int8_t lv9;
 	int8_t dm; // BT diff mode
-	int8_t ir; // BT indicator and power resolution
 	int8_t ble_1m;
-	int8_t ble_2m;
-	int8_t ble_lr_s2;
-	int8_t ble_lr_s8;
 	char country_code[COUNTRY_CODE_LEN + 1];
 };
 
@@ -503,7 +464,8 @@ void btmtk_set_bt_power_by_country_code(char *code);
 void btmtk_write_country_bt_power(char *cty, char *pwr[]);
 int btmtk_read_country_bt_power(void);
 void btmtk_delete_country_bt_power(char *cty);
-int btmtk_is_country_code_set(void);
+char *btmtk_get_default_country_code(void);
+int btmtk_set_default_country_code(char *cty_code);
 int btmtk_send_low_power_cmd(void);
 void btmtk_suspend(void);
 void btmtk_resume(void);

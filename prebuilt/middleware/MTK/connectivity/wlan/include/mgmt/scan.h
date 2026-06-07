@@ -932,4 +932,5 @@ void scanCheckEpigramVhtIE(IN uint8_t *pucBuf, IN struct BSS_DESC *prBssDesc);
 void scanParseVHTCapIE(IN uint8_t *pucIE, IN struct BSS_DESC *prBssDesc);
 void scanParseVHTOpIE(IN uint8_t *pucIE, IN struct BSS_DESC *prBssDesc);
 
+const char *SSID2STR(const uint8_t *ssid, uint8_t ssid_len);
 #endif /* _SCAN_H */

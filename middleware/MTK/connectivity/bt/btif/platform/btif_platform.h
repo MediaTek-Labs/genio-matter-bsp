@@ -17,5 +17,6 @@ void btif_platform_clk_ctrl(unsigned char en);
 void btif_platform_apdma_clk_ctrl(unsigned char en);
 void btif_platform_dcache_clean(void);
 unsigned char *btif_platform_apdma_get_vfifo(unsigned char dir);
+bool btif_platform_check_vfifo_buf_align(void);
 
 #endif /*_BTIF_PLATFORM_H_*/

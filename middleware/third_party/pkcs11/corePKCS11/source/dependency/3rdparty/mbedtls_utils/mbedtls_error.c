@@ -250,10 +250,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
                 case -( MBEDTLS_ERR_CIPHER_INVALID_CONTEXT ):
                     rc = "CIPHER - The context is invalid. For example, because it was freed";
                     break;
-
-                case -( MBEDTLS_ERR_CIPHER_HW_ACCEL_FAILED ):
-                    rc = "CIPHER - Cipher hardware accelerator failed";
-                    break;
             #endif /* MBEDTLS_CIPHER_C */
 
             #if defined( MBEDTLS_DHM_C )
@@ -334,14 +330,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
                 case -( MBEDTLS_ERR_ECP_SIG_LEN_MISMATCH ):
                     rc = "ECP - The buffer contains a valid signature followed by more data";
                     break;
-
-                case -( MBEDTLS_ERR_ECP_HW_ACCEL_FAILED ):
-                    rc = "ECP - The ECP hardware accelerator failed";
-                    break;
-
-                case -( MBEDTLS_ERR_ECP_IN_PROGRESS ):
-                    rc = "ECP - Operation in progress, call again with the same parameters to continue";
-                    break;
             #endif /* MBEDTLS_ECP_C */
 
             #if defined( MBEDTLS_MD_C )
@@ -359,10 +347,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
 
                 case -( MBEDTLS_ERR_MD_FILE_IO_ERROR ):
                     rc = "MD - Opening or reading of file failed";
-                    break;
-
-                case -( MBEDTLS_ERR_MD_HW_ACCEL_FAILED ):
-                    rc = "MD - MD hardware accelerator failed";
                     break;
             #endif /* MBEDTLS_MD_C */
 
@@ -460,10 +444,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
                 case -( MBEDTLS_ERR_PK_SIG_LEN_MISMATCH ):
                     rc = "PK - The buffer contains a valid signature followed by more data";
                     break;
-
-                case -( MBEDTLS_ERR_PK_HW_ACCEL_FAILED ):
-                    rc = "PK - PK hardware accelerator failed";
-                    break;
             #endif /* MBEDTLS_PK_C */
 
             #if defined( MBEDTLS_PKCS12_C )
@@ -538,14 +518,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
                 case -( MBEDTLS_ERR_RSA_RNG_FAILED ):
                     rc = "RSA - The random generator failed to generate non-zeros";
                     break;
-
-                case -( MBEDTLS_ERR_RSA_UNSUPPORTED_OPERATION ):
-                    rc = "RSA - The implementation does not offer the requested operation, for example, because of security violations or lack of functionality";
-                    break;
-
-                case -( MBEDTLS_ERR_RSA_HW_ACCEL_FAILED ):
-                    rc = "RSA - RSA hardware accelerator failed";
-                    break;
             #endif /* MBEDTLS_RSA_C */
 
             #if defined( MBEDTLS_SSL_TLS_C )
@@ -569,28 +541,12 @@ const char * mbedtls_strerror_highlevel( int errnum )
                     rc = "SSL - The connection indicated an EOF";
                     break;
 
-                case -( MBEDTLS_ERR_SSL_UNKNOWN_CIPHER ):
-                    rc = "SSL - An unknown cipher was received";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_NO_CIPHER_CHOSEN ):
-                    rc = "SSL - The server has no ciphersuites in common with the client";
-                    break;
-
                 case -( MBEDTLS_ERR_SSL_NO_RNG ):
                     rc = "SSL - No RNG was provided to the SSL module";
                     break;
 
                 case -( MBEDTLS_ERR_SSL_NO_CLIENT_CERTIFICATE ):
                     rc = "SSL - No client certification received from the client, but required by the authentication mode";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_CERTIFICATE_TOO_LARGE ):
-                    rc = "SSL - Our own certificate(s) is/are too large to send in an SSL message";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_CERTIFICATE_REQUIRED ):
-                    rc = "SSL - The own certificate is not set, but needed by the server";
                     break;
 
                 case -( MBEDTLS_ERR_SSL_PRIVATE_KEY_REQUIRED ):
@@ -609,60 +565,8 @@ const char * mbedtls_strerror_highlevel( int errnum )
                     rc = "SSL - A fatal alert message was received from our peer";
                     break;
 
-                case -( MBEDTLS_ERR_SSL_PEER_VERIFY_FAILED ):
-                    rc = "SSL - Verification of our peer failed";
-                    break;
-
                 case -( MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY ):
                     rc = "SSL - The peer notified us that the connection is going to be closed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CLIENT_HELLO ):
-                    rc = "SSL - Processing of the ClientHello handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_SERVER_HELLO ):
-                    rc = "SSL - Processing of the ServerHello handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CERTIFICATE ):
-                    rc = "SSL - Processing of the Certificate handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CERTIFICATE_REQUEST ):
-                    rc = "SSL - Processing of the CertificateRequest handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_SERVER_KEY_EXCHANGE ):
-                    rc = "SSL - Processing of the ServerKeyExchange handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_SERVER_HELLO_DONE ):
-                    rc = "SSL - Processing of the ServerHelloDone handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CLIENT_KEY_EXCHANGE ):
-                    rc = "SSL - Processing of the ClientKeyExchange handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CLIENT_KEY_EXCHANGE_RP ):
-                    rc = "SSL - Processing of the ClientKeyExchange handshake message failed in DHM / ECDH Read Public";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CLIENT_KEY_EXCHANGE_CS ):
-                    rc = "SSL - Processing of the ClientKeyExchange handshake message failed in DHM / ECDH Calculate Secret";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CERTIFICATE_VERIFY ):
-                    rc = "SSL - Processing of the CertificateVerify handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_CHANGE_CIPHER_SPEC ):
-                    rc = "SSL - Processing of the ChangeCipherSpec handshake message failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_FINISHED ):
-                    rc = "SSL - Processing of the Finished handshake message failed";
                     break;
 
                 case -( MBEDTLS_ERR_SSL_ALLOC_FAILED ):
@@ -675,18 +579,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
 
                 case -( MBEDTLS_ERR_SSL_HW_ACCEL_FALLTHROUGH ):
                     rc = "SSL - Hardware acceleration function skipped / left alone data";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_COMPRESSION_FAILED ):
-                    rc = "SSL - Processing of the compression / decompression failed";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_PROTOCOL_VERSION ):
-                    rc = "SSL - Handshake protocol not within min/max boundaries";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_BAD_HS_NEW_SESSION_TICKET ):
-                    rc = "SSL - Processing of the NewSessionTicket handshake message failed";
                     break;
 
                 case -( MBEDTLS_ERR_SSL_SESSION_TICKET_EXPIRED ):
@@ -721,10 +613,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
                     rc = "SSL - A buffer is too small to receive or write a message";
                     break;
 
-                case -( MBEDTLS_ERR_SSL_NO_USABLE_CIPHERSUITE ):
-                    rc = "SSL - None of the common ciphersuites is usable (eg, no suitable certificate, see debug messages)";
-                    break;
-
                 case -( MBEDTLS_ERR_SSL_WANT_READ ):
                     rc = "SSL - No data of requested type currently available on underlying transport";
                     break;
@@ -747,10 +635,6 @@ const char * mbedtls_strerror_highlevel( int errnum )
 
                 case -( MBEDTLS_ERR_SSL_NON_FATAL ):
                     rc = "SSL - The alert message received indicates a non-fatal error";
-                    break;
-
-                case -( MBEDTLS_ERR_SSL_INVALID_VERIFY_HASH ):
-                    rc = "SSL - Couldn't set the hash for verifying CertificateVerify";
                     break;
 
                 case -( MBEDTLS_ERR_SSL_CONTINUE_PROCESSING ):
@@ -891,14 +775,6 @@ const char * mbedtls_strerror_lowlevel( int errnum )
             case -( MBEDTLS_ERR_AES_BAD_INPUT_DATA ):
                 rc = "AES - Invalid input data";
                 break;
-
-            case -( MBEDTLS_ERR_AES_FEATURE_UNAVAILABLE ):
-                rc = "AES - Feature not available. For example, an unsupported AES key size";
-                break;
-
-            case -( MBEDTLS_ERR_AES_HW_ACCEL_FAILED ):
-                rc = "AES - AES hardware accelerator failed";
-                break;
         #endif /* MBEDTLS_AES_C */
 
         #if defined( MBEDTLS_ARC4_C )
@@ -1035,10 +911,6 @@ const char * mbedtls_strerror_lowlevel( int errnum )
             case -( MBEDTLS_ERR_CCM_AUTH_FAILED ):
                 rc = "CCM - Authenticated decryption failed";
                 break;
-
-            case -( MBEDTLS_ERR_CCM_HW_ACCEL_FAILED ):
-                rc = "CCM - CCM hardware accelerator failed";
-                break;
         #endif /* MBEDTLS_CCM_C */
 
         #if defined( MBEDTLS_CHACHA20_C )
@@ -1093,10 +965,6 @@ const char * mbedtls_strerror_lowlevel( int errnum )
             case -( MBEDTLS_ERR_DES_INVALID_INPUT_LENGTH ):
                 rc = "DES - The data input has an invalid length";
                 break;
-
-            case -( MBEDTLS_ERR_DES_HW_ACCEL_FAILED ):
-                rc = "DES - DES hardware accelerator failed";
-                break;
         #endif /* MBEDTLS_DES_C */
 
         #if defined( MBEDTLS_ENTROPY_C )
@@ -1125,11 +993,6 @@ const char * mbedtls_strerror_lowlevel( int errnum )
             case -( MBEDTLS_ERR_GCM_AUTH_FAILED ):
                 rc = "GCM - Authenticated decryption failed";
                 break;
-
-            case -( MBEDTLS_ERR_GCM_HW_ACCEL_FAILED ):
-                rc = "GCM - GCM hardware accelerator failed";
-                break;
-
             case -( MBEDTLS_ERR_GCM_BAD_INPUT ):
                 rc = "GCM - Bad input parameters to function";
                 break;
@@ -1247,16 +1110,6 @@ const char * mbedtls_strerror_lowlevel( int errnum )
                 break;
         #endif /* MBEDTLS_PADLOCK_C */
 
-        #if defined( MBEDTLS_PLATFORM_C )
-            case -( MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED ):
-                rc = "PLATFORM - Hardware accelerator failed";
-                break;
-
-            case -( MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED ):
-                rc = "PLATFORM - The requested feature is not supported by the platform";
-                break;
-        #endif /* MBEDTLS_PLATFORM_C */
-
         #if defined( MBEDTLS_POLY1305_C )
             case -( MBEDTLS_ERR_POLY1305_BAD_INPUT_DATA ):
                 rc = "POLY1305 - Invalid input parameter(s)";
@@ -1278,40 +1131,24 @@ const char * mbedtls_strerror_lowlevel( int errnum )
         #endif /* MBEDTLS_RIPEMD160_C */
 
         #if defined( MBEDTLS_SHA1_C )
-            case -( MBEDTLS_ERR_SHA1_HW_ACCEL_FAILED ):
-                rc = "SHA1 - SHA-1 hardware accelerator failed";
-                break;
-
             case -( MBEDTLS_ERR_SHA1_BAD_INPUT_DATA ):
                 rc = "SHA1 - SHA-1 input data was malformed";
                 break;
         #endif /* MBEDTLS_SHA1_C */
 
         #if defined( MBEDTLS_SHA256_C )
-            case -( MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED ):
-                rc = "SHA256 - SHA-256 hardware accelerator failed";
-                break;
-
             case -( MBEDTLS_ERR_SHA256_BAD_INPUT_DATA ):
                 rc = "SHA256 - SHA-256 input data was malformed";
                 break;
         #endif /* MBEDTLS_SHA256_C */
 
         #if defined( MBEDTLS_SHA512_C )
-            case -( MBEDTLS_ERR_SHA512_HW_ACCEL_FAILED ):
-                rc = "SHA512 - SHA-512 hardware accelerator failed";
-                break;
-
             case -( MBEDTLS_ERR_SHA512_BAD_INPUT_DATA ):
                 rc = "SHA512 - SHA-512 input data was malformed";
                 break;
         #endif /* MBEDTLS_SHA512_C */
 
         #if defined( MBEDTLS_THREADING_C )
-            case -( MBEDTLS_ERR_THREADING_FEATURE_UNAVAILABLE ):
-                rc = "THREADING - The selected feature is not available";
-                break;
-
             case -( MBEDTLS_ERR_THREADING_BAD_INPUT_DATA ):
                 rc = "THREADING - Bad input parameters to function";
                 break;

@@ -118,6 +118,7 @@ int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
 int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx,
                                      const unsigned char data[64] );
 
+#if 0
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
 #if defined(MBEDTLS_DEPRECATED_WARNING)
 #define MBEDTLS_DEPRECATED      __attribute__((deprecated))
@@ -134,7 +135,7 @@ int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx,
  *                 <ul><li>0: Use SHA-256.</li>
  *                 <li>1: Use SHA-224.</li></ul>
  */
-MBEDTLS_DEPRECATED void mbedtls_sha256_starts( mbedtls_sha256_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_sha256_starts( mbedtls_sha256_context *ctx,
                                                int is224 );
 
 /**
@@ -147,7 +148,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha256_starts( mbedtls_sha256_context *ctx,
  * \param input    The buffer holding the data.
  * \param ilen     The length of the input data.
  */
-MBEDTLS_DEPRECATED void mbedtls_sha256_update( mbedtls_sha256_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_sha256_update( mbedtls_sha256_context *ctx,
                                                const unsigned char *input,
                                                size_t ilen );
 
@@ -160,7 +161,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha256_update( mbedtls_sha256_context *ctx,
  * \param ctx      The SHA-256 context.
  * \param output   The SHA-224or SHA-256 checksum result.
  */
-MBEDTLS_DEPRECATED void mbedtls_sha256_finish( mbedtls_sha256_context *ctx,
+MBEDTLS_DEPRECATED int mbedtls_sha256_finish( mbedtls_sha256_context *ctx,
                                                unsigned char output[32] );
 
 /**
@@ -178,7 +179,7 @@ MBEDTLS_DEPRECATED void mbedtls_sha256_process( mbedtls_sha256_context *ctx,
 
 #undef MBEDTLS_DEPRECATED
 #endif /* !MBEDTLS_DEPRECATED_REMOVED */
-
+#endif
 #ifdef __cplusplus
 }
 #endif
